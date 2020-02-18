@@ -7,7 +7,7 @@ CFLAGS := -I$(DIRHEA) -c -Wall -ansi
 LDLIBS := -lpthread -lrt
 CC := gcc
 
-all : dirs manager pa
+all : dirs manager pa pb
 
 dirs:
 	mkdir -p $(DIROBJ) $(DIREXE)
@@ -32,9 +32,12 @@ solution:
 
 clean :
 	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~
-	rmdir 0*
-	rmdir 55*
-	rmdir 75*
+	rm -rf 0*
+	rm -rf 55*
+	rm -rf 75*
 
 run:
 	./exec/manager
+
+run-pb:
+	./exec/pb
