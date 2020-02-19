@@ -7,6 +7,7 @@
 #include <fcntl.h>
 
 #define ESPACIO " "
+#define COPY "cp "
 #define N_BYTES 4096
 #define BARRA "/"
 #define SRC_PATH "modelos/"
@@ -16,33 +17,20 @@ ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
 void copiar (char *src_path, char *dst_path) {
 
-  unsigned char buffer[N_BYTES];
-  int src_fd = open(src_path, O_RDONLY);
-  int dst_fd = open(dst_path, O_CREAT | O_WRONLY);
-  int err, n;
+  int len = sizeof(src_path) + sizeof(dst_path) + sizeof(COPY) + sizeof(ESPACIO);
+  char command[len];
 
-  while (1) {
+  strcat(command, COPY);
+  strcat(command, src_path);
+  strcat(command, ESPACIO);
+  strcat(command, dst_path);
 
-     err = read(src_fd, buffer, N_BYTES);
-     if (err == -1) {
-         printf("Error reading file.\n");
-         exit(1);
-     }
+  printf("%s\n", command);
 
-     n = err;
-     if (n == 0) {
-       break;
-     }
+  system(command);
 
-     err = write(dst_fd, buffer, n);
-     if (err == -1) {
-         printf("Error writing to file.\n");
-         exit(1);
-     }
-  }
+  memset(&command[0], 0, sizeof(command));
 
-  close(src_fd);
-  close(dst_fd);
 }
 
 int main(int argc, char const *argv[]) {
@@ -72,13 +60,10 @@ int main(int argc, char const *argv[]) {
         /* Construimos el directorio destino */
         strcat(dst_path, nombre_dir);
         strcat(dst_path, BARRA);
-        strcat(dst_path, file_name);
 
         /* Construimos el directorio origen */
         strcat(src_path, SRC_PATH);
         strcat(src_path, file_name);
-
-        printf("%s\n", src_path);
 
         copiar(src_path, dst_path);
 
