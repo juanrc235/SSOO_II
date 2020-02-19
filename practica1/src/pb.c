@@ -20,17 +20,16 @@ void copiar (char *src_path, char *dst_path) {
   int len = sizeof(src_path) + sizeof(dst_path) + sizeof(COPY) + sizeof(ESPACIO);
   char command[len];
 
+  memset(&command[0], 0, sizeof(command));
+
   strcat(command, COPY);
   strcat(command, src_path);
   strcat(command, ESPACIO);
   strcat(command, dst_path);
 
-  printf("%s\n", command);
+  printf("[PB] Copiado <%s> en <%s>\n", src_path, dst_path);
 
   system(command);
-
-  memset(&command[0], 0, sizeof(command));
-
 }
 
 int main(int argc, char const *argv[]) {
@@ -52,6 +51,10 @@ int main(int argc, char const *argv[]) {
       tipo_ex = strtok(NULL, ESPACIO);
 
       if (stat(nombre_dir, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+        /* Limpia las variables */
+        memset(&file_name[0], 0, sizeof(file_name));
+        memset(&dst_path[0], 0, sizeof(dst_path));
+        memset(&src_path[0], 0, sizeof(src_path));
 
         /* Construimos el nombre del fichero */
         strcat(file_name, tipo_ex);
@@ -67,10 +70,6 @@ int main(int argc, char const *argv[]) {
 
         copiar(src_path, dst_path);
 
-        /* Limpia las variables */
-        memset(&file_name[0], 0, sizeof(file_name));
-        memset(&dst_path[0], 0, sizeof(dst_path));
-        memset(&src_path[0], 0, sizeof(src_path));
       } else {
         printf("[PB] El directorio <%s/> no existe\n", nombre_dir);
       }
