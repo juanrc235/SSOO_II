@@ -24,13 +24,12 @@ void crear_dir(char nombre_dir[], int permisos) {
 
 int main(int argc, char const *argv[]) {
 
-  char *nombre_fichero = "estudiantes_p1.text";
   char *line = NULL;
   char *nombre_dir = NULL;
   size_t len = 0;
 
   FILE *file;
-  file = fopen(nombre_fichero, "r");
+  file = fopen(argv[0], "r");
 
   if (file) {
 

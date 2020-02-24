@@ -40,7 +40,7 @@ clean :
 	rm -rf 75*
 
 run:
-	./exec/manager
+	./exec/manager estudiantes_p1.text
 
 run-pb:
 	./exec/pb

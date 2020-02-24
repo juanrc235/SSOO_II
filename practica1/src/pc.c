@@ -10,7 +10,6 @@
 #define MINIMA_NOTA 5
 #define MSG "La nota que debes obtener en este nuevo examen para superar la prueba es"
 #define NOMBRE_FICHERO "fichero.txt"
-#define BARRA "/"
 
 ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
@@ -29,7 +28,7 @@ int main(int argc, char const *argv[]) {
   FILE *file;
   FILE *e_file;
 
-  file = fopen("estudiantes_p1.text", "r");
+  file = fopen(argv[0], "r");
 
   if (file) {
 
@@ -40,29 +39,21 @@ int main(int argc, char const *argv[]) {
       str_nota = strtok(NULL, ESPACIO);
       nota = atoi(str_nota);
 
-      memset(&dst_path[0], 0, sizeof(dst_path));
-      memset(&msg[0], 0, sizeof(msg));
-
-      strcat(dst_path, nombre_dir);
-      strcat(dst_path, BARRA);
-      strcat(dst_path, NOMBRE_FICHERO);
+      sprintf(dst_path, "%s/%s", nombre_dir, NOMBRE_FICHERO);
       e_file = fopen(dst_path, "w");
 
-      printf("[PC] Escrito mensaje en <%s>\n", dst_path);
-
-      strcat(msg, MSG);
-      strcat(msg, ESPACIO);
-      sprintf(str_nota, "%d", nota);
-      strcat(msg, str_nota);
-      strcat(msg, "\t\n");
+      sprintf(msg, "%s %d\t\n", MSG, nota);
       fwrite(msg, 1, sizeof(msg), e_file);
+
+      /*printf("[PC] Escrito mensaje en <%s>\n", dst_path);*/
 
       fclose(e_file);
 
     }
-
     fclose(file);
   }
+
+  fprintf(stdout, "3");
 
   return 0;
 }

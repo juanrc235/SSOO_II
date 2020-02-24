@@ -7,26 +7,16 @@
 #include <fcntl.h>
 
 #define ESPACIO " "
-#define COPY "cp "
 #define N_BYTES 4096
-#define BARRA "/"
-#define SRC_PATH "modelos/"
-#define EXTENSION ".pdf"
 
 ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
 void copiar (char *src_path, char *dst_path) {
 
-  int len = sizeof(src_path) + sizeof(dst_path) + sizeof(COPY) + sizeof(ESPACIO);
+  int len = sizeof(src_path) + sizeof(dst_path) + 3;
   char command[len];
 
-  memset(&command[0], 0, sizeof(command));
-
-  strcat(command, COPY);
-  strcat(command, src_path);
-  strcat(command, ESPACIO);
-  strcat(command, dst_path);
-
+  sprintf(command, "cp %s %s", src_path, dst_path);
   printf("[PB] Copiado <%s> en <%s>\n", src_path, dst_path);
 
   system(command);
@@ -42,7 +32,7 @@ int main(int argc, char const *argv[]) {
   size_t len = 0;
   FILE *file;
 
-  file = fopen("estudiantes_p1.text", "r");
+  file = fopen(argv[0], "r");
 
   if (file) {
 
@@ -51,22 +41,15 @@ int main(int argc, char const *argv[]) {
       tipo_ex = strtok(NULL, ESPACIO);
 
       if (stat(nombre_dir, &sb) == 0 && S_ISDIR(sb.st_mode)) {
-        /* Limpia las variables */
-        memset(&file_name[0], 0, sizeof(file_name));
-        memset(&dst_path[0], 0, sizeof(dst_path));
-        memset(&src_path[0], 0, sizeof(src_path));
 
         /* Construimos el nombre del fichero */
-        strcat(file_name, tipo_ex);
-        strcat(file_name, EXTENSION);
+        sprintf(file_name, "%s.pdf", tipo_ex);
 
         /* Construimos el directorio destino */
-        strcat(dst_path, nombre_dir);
-        strcat(dst_path, BARRA);
+        sprintf(dst_path, "%s/", nombre_dir);
 
         /* Construimos el directorio origen */
-        strcat(src_path, SRC_PATH);
-        strcat(src_path, file_name);
+        sprintf(src_path, "modelos/%s", file_name);
 
         copiar(src_path, dst_path);
 
