@@ -7,7 +7,7 @@ CFLAGS := -I$(DIRHEA) -c -Wall -ansi
 LDLIBS := -lpthread -lrt
 CC := gcc
 
-all : dirs manager pa pb pc
+all : dirs manager pa pb pc pd
 
 dirs:
 	mkdir -p $(DIROBJ) $(DIREXE)
@@ -24,6 +24,9 @@ pb: $(DIROBJ)pb.o
 pc: $(DIROBJ)pc.o
 	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
 
+pd: $(DIROBJ)pd.o
+	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
+
 $(DIROBJ)%.o: $(DIRSRC)%.c
 	$(CC) $(CFLAGS) $^ -o $@
 
@@ -38,6 +41,8 @@ clean :
 	rm -rf 0*
 	rm -rf 55*
 	rm -rf 75*
+	rm log.txt
+	rm *.o
 
 run:
 	./exec/manager estudiantes_p1.text
@@ -47,3 +52,6 @@ run-pb:
 
 run-pc:
 	./exec/pc
+
+run-pd:
+	./exec/pd estudiantes_p1.text

@@ -34,6 +34,8 @@ int main(int argc, char const *argv[]) {
 
   file = fopen(argv[0], "r");
 
+  sleep(50);
+
   if (file) {
 
     while (getdelim(&line, &len, '\n', file) != -1) {

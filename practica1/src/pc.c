@@ -21,7 +21,7 @@ int main(int argc, char const *argv[]) {
 
   char *line = NULL;
   char *nombre_dir = NULL, *str_nota = NULL, dst_path[256];
-  int nota = 0, n_bytes = sizeof(MSG) + 3;
+  int nota = 0, n_bytes = sizeof(MSG) + 3, sumatorio = 0, n_alumnos = 0;
   char msg[n_bytes];
 
   size_t len = 0;
@@ -29,6 +29,8 @@ int main(int argc, char const *argv[]) {
   FILE *e_file;
 
   file = fopen(argv[0], "r");
+
+  sleep(50);
 
   if (file) {
 
@@ -38,6 +40,8 @@ int main(int argc, char const *argv[]) {
       strtok(NULL, ESPACIO);
       str_nota = strtok(NULL, ESPACIO);
       nota = atoi(str_nota);
+      sumatorio += nota;
+      n_alumnos += 1;
 
       sprintf(dst_path, "%s/%s", nombre_dir, NOMBRE_FICHERO);
       e_file = fopen(dst_path, "w");
@@ -45,15 +49,13 @@ int main(int argc, char const *argv[]) {
       sprintf(msg, "%s %d\t\n", MSG, nota);
       fwrite(msg, 1, sizeof(msg), e_file);
 
-      /*printf("[PC] Escrito mensaje en <%s>\n", dst_path);*/
-
       fclose(e_file);
 
     }
     fclose(file);
   }
 
-  fprintf(stdout, "3");
+  printf("%.2f", (double)sumatorio/n_alumnos);
 
   return 0;
 }
