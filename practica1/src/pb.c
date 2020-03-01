@@ -1,11 +1,10 @@
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "constantes.h"
-
-ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
 void copiar (char *src_path, char *dst_path) {
 

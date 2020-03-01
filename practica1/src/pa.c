@@ -1,9 +1,12 @@
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "constantes.h"
+
+#include <unistd.h>
 
 ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
@@ -20,6 +23,8 @@ void crear_dir(char nombre_dir[], int permisos) {
 }
 
 int main(int argc, char const *argv[]) {
+
+  /*sleep(20); para probar el Ctrl+C*/
 
   char *line = NULL;
   char *nombre_dir = NULL;

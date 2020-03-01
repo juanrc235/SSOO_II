@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -5,16 +6,13 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <signal.h>
-
-#define NUM_PROC 2
-#define LEER 0
-#define ESCRIBIR 1
+#include "constantes.h"
 
 pid_t g_pid[3];
+const char *fichero_datos;
 
 void manejador(int);
-int kill(pid_t pid, int sig);
-ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
+void cambiar_programa(const char *path, const char *file);
 
 int main(int argc, char const *argv[]) {
 
@@ -30,7 +28,8 @@ int main(int argc, char const *argv[]) {
   int tuberia[2];
   char media[2] = {0};
   FILE *fd_log;
-  fd_log = fopen("log.txt", "a");
+  fd_log = fopen(N_LOG, "a");
+  fichero_datos = argv[1];
 
   fprintf(fd_log, "******** Log del sistema ********\n");
 
@@ -40,16 +39,12 @@ int main(int argc, char const *argv[]) {
     fprintf(stderr, "[MANAGER] Error creando el proceso A\n");
 		return EXIT_FAILURE;
   } else if (pa_pid == 0) {
-    execl("./exec/pa", argv[1], NULL);
-    fprintf(stderr, "[MANAGER] ERROR en execl\n");
-    return EXIT_FAILURE;
+    cambiar_programa(RUTA_PA, fichero_datos);
   } else if (pa_pid > 0) {
       waitpid(pa_pid, &status, 0);
       if (status == EXIT_FAILURE) {
         return EXIT_FAILURE;
-
       }
-
       printf("[MANAGER] Proceso [PA] finaliza\n");
       fprintf(fd_log, "Creación de directorios finalizada.\n");
   }
@@ -62,21 +57,17 @@ int main(int argc, char const *argv[]) {
       switch (i) {
         case 0:
           printf("[MANAGER] Creando proceso [PB]\n");
-          execl("./exec/pb", argv[1], NULL);
-          fprintf(stderr, "[MANAGER] ERROR en execl\n");
-          return EXIT_FAILURE;
+          cambiar_programa("RUTA_PB", fichero_datos);
         break;
         case 1:
           printf("[MANAGER] Creando proceso [PC]\n");
           dup2(tuberia[ESCRIBIR], STDOUT_FILENO);
-          execl("./exec/pc", argv[1], NULL);
-          fprintf(stderr, "[MANAGER] ERROR en execl\n");
-          return EXIT_FAILURE;
+          cambiar_programa("RUTA_PC", fichero_datos);
         break;
       }
     } else if(pids[i] > 0) {
     } else {
-      fprintf(stderr, "[MANAGER] Error creado [PA] y [PC]\n");
+      fprintf(stderr, "[MANAGER] Error creado [PB] y [PC]\n");
       return EXIT_FAILURE;
     }
   }
@@ -92,6 +83,8 @@ int main(int argc, char const *argv[]) {
     }
   }
 
+  sleep(20);
+
   read(tuberia[LEER], media, sizeof(media));
   fprintf(fd_log, "La nota media de la clase es: %s\n", media);
 
@@ -100,12 +93,38 @@ int main(int argc, char const *argv[]) {
   return EXIT_SUCCESS;
 }
 
+void cambiar_programa(const char *path, const char *file) {
+  execl(path, file, NULL);
+  fprintf(stderr, "[MANAGER] ERROR en execl\n");
+  exit(EXIT_FAILURE);
+}
+
 void manejador(int signal) {
   int i;
-  printf("[MANAGER] Todos muertos");
+  printf("\n[MANAGER] Eliminando procesos ...\n");
   for (i=0; i < 3; i++) {
-    /*kill(g_pid[i], SIGKILL);*/
-    
+    if (g_pid[i] != 0) {
+      kill(g_pid[i], SIGKILL);
+    }
   }
-  printf("[MANAGER] Todos muertos");
+
+  printf("[MANAGER] Todos muertos, llamando a [PD] para que limpie ...\n");
+
+  pid_t pd_pid = fork();
+  int status;
+
+  if (pd_pid == -1) {
+    fprintf(stderr, "[MANAGER] Error creando el proceso [PD]\n");
+    exit(EXIT_FAILURE);
+  } else if (pd_pid == 0) {
+    cambiar_programa(RUTA_PD, fichero_datos);
+  } else if (pd_pid > 0) {
+    waitpid(pd_pid, &status, 0);
+    if (status == EXIT_FAILURE) {
+      exit(EXIT_FAILURE);
+    }
+    printf("[MANAGER] Finalizado [PD]. Todo los directorios borrados \n");
+  }
+
+  exit(EXIT_SUCCESS);
 }

@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +21,8 @@ int main(int argc, char const *argv[]) {
       nombre_dir = strtok(line, ESPACIO);
       sprintf(command, "rm -fr %s", nombre_dir);
       system(command);
-
+      printf("[PD] Eliminado %s\n", nombre_dir);
+      
     }
     fclose(file);
   }

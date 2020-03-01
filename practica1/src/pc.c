@@ -1,9 +1,8 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "constantes.h"
-
-ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
 int calcular_nota_necesaria(int n1) {
   return  2*MINIMA_NOTA - n1;
