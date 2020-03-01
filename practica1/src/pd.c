@@ -12,7 +12,7 @@ int main(int argc, char const *argv[]) {
   char command[16];
   char *nombre_dir = NULL;
 
-  file = fopen(argv[1], "r");
+  file = fopen(argv[0], "r");
 
   if (file) {
 
@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]) {
       sprintf(command, "rm -fr %s", nombre_dir);
       system(command);
       printf("[PD] Eliminado %s\n", nombre_dir);
-      
+
     }
     fclose(file);
   }
