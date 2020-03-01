@@ -1,15 +1,7 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
-
-#define ESPACIO " "
-#define MINIMA_NOTA 5
-#define MSG "La nota que debes obtener en este nuevo examen para superar la prueba es"
-#define NOMBRE_FICHERO "fichero.txt"
+#include "constantes.h"
 
 ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
@@ -29,8 +21,6 @@ int main(int argc, char const *argv[]) {
   FILE *e_file;
 
   file = fopen(argv[0], "r");
-
-  sleep(50);
 
   if (file) {
 

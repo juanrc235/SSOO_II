@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <sys/types.h>
+#include <signal.h>
 
 #define NUM_PROC 2
 #define LEER 0
@@ -13,8 +13,12 @@
 pid_t g_pid[3];
 
 void manejador(int);
+int kill(pid_t pid, int sig);
+ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
 int main(int argc, char const *argv[]) {
+
+  signal(SIGINT, manejador);
 
   if (argc != 2) {
     fprintf(stderr, "[MANAGER] Es necesario especificar el fichero de datos\n");
@@ -30,8 +34,6 @@ int main(int argc, char const *argv[]) {
 
   fprintf(fd_log, "******** Log del sistema ********\n");
 
-  signal(SIGINT, manejador);
-
   pa_pid = fork();
   g_pid[0] = pa_pid;
   if (pa_pid == -1) {
@@ -41,17 +43,16 @@ int main(int argc, char const *argv[]) {
     execl("./exec/pa", argv[1], NULL);
     fprintf(stderr, "[MANAGER] ERROR en execl\n");
     return EXIT_FAILURE;
+  } else if (pa_pid > 0) {
+      waitpid(pa_pid, &status, 0);
+      if (status == EXIT_FAILURE) {
+        return EXIT_FAILURE;
+
+      }
+
+      printf("[MANAGER] Proceso [PA] finaliza\n");
+      fprintf(fd_log, "Creación de directorios finalizada.\n");
   }
-
-  waitpid(pa_pid, &status, 0);
-
-  if (status == EXIT_FAILURE) {
-    return EXIT_FAILURE;
-    /* limpiar todo */
-  }
-
-  printf("[MANAGER] Proceso [PA] finaliza\n");
-  fprintf(fd_log, "Creación de directorios finalizada.\n");
 
   pipe(tuberia);
 
@@ -95,6 +96,7 @@ int main(int argc, char const *argv[]) {
   fprintf(fd_log, "La nota media de la clase es: %s\n", media);
 
   fclose(fd_log);
+
   return EXIT_SUCCESS;
 }
 
@@ -102,7 +104,8 @@ void manejador(int signal) {
   int i;
   printf("[MANAGER] Todos muertos");
   for (i=0; i < 3; i++) {
-    kill(g_pid[i], SIGKILL);
+    /*kill(g_pid[i], SIGKILL);*/
+    
   }
   printf("[MANAGER] Todos muertos");
 }

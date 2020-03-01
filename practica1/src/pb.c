@@ -1,19 +1,15 @@
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <fcntl.h>
-
-#define ESPACIO " "
-#define N_BYTES 4096
+#include "constantes.h"
 
 ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
 void copiar (char *src_path, char *dst_path) {
 
-  int len = sizeof(src_path) + sizeof(dst_path) + 3;
+  int len = sizeof(src_path) + sizeof(dst_path) + EXTRA_BYTES;
   char command[len];
 
   sprintf(command, "cp %s %s", src_path, dst_path);
@@ -33,8 +29,6 @@ int main(int argc, char const *argv[]) {
   FILE *file;
 
   file = fopen(argv[0], "r");
-
-  sleep(50);
 
   if (file) {
 

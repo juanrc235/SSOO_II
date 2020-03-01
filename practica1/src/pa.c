@@ -1,12 +1,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#define PERMISOS 0777
-#define ESPACIO " "
+#include "constantes.h"
 
 ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
@@ -30,8 +27,6 @@ int main(int argc, char const *argv[]) {
 
   FILE *file;
   file = fopen(argv[0], "r");
-
-  sleep(50);
 
   if (file) {
 
