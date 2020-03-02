@@ -9,15 +9,16 @@
 #include "constantes.h"
 
 pid_t g_pid[3];
+FILE *fd_log;
 const char *fichero_datos;
 
 void manejador(int);
 void cambiar_programa(const char *path, const char *file);
-void crear_y_esperar_pa(FILE *fd_log);
-void crear_y_esperar_pb_y_pc(int tuberia[2], FILE *fd_log);
+void crear_y_esperar_pa();
+void crear_y_esperar_pb_y_pc(int tuberia[2]);
 void crear_y_esperar_pd();
 void esperar_pb_pc();
-void recibir_media(int tuberia[2], FILE *fd_log);
+void recibir_media(int tuberia[2]);
 
 int main(int argc, char const *argv[]) {
 
@@ -29,17 +30,18 @@ int main(int argc, char const *argv[]) {
   }
 
   int tuberia[2];
-  FILE *fd_log;
   fd_log = fopen(N_LOG, "a");
   fichero_datos = argv[1];
 
   fprintf(fd_log, "******** Log del sistema ********\n");
 
-  crear_y_esperar_pa(fd_log);
+  crear_y_esperar_pa();
 
-  crear_y_esperar_pb_y_pc(tuberia, fd_log);
+  crear_y_esperar_pb_y_pc(tuberia);
 
-  recibir_media(tuberia, fd_log);
+  recibir_media(tuberia);
+
+  fprintf(fd_log, "******* FIN DE PROGRAMA *********\n");
 
   fclose(fd_log);
 
@@ -69,7 +71,7 @@ void crear_y_esperar_pd(){
   }
 }
 
-void crear_y_esperar_pa(FILE *fd_log) {
+void crear_y_esperar_pa() {
 
   int status;
 
@@ -91,7 +93,7 @@ void crear_y_esperar_pa(FILE *fd_log) {
 
 }
 
-void crear_y_esperar_pb_y_pc(int tuberia[2], FILE *fd_log) {
+void crear_y_esperar_pb_y_pc(int tuberia[2]) {
 
   int i, status;
   pid_t pids[NUM_PROC], tmp_pid;
@@ -130,7 +132,7 @@ void crear_y_esperar_pb_y_pc(int tuberia[2], FILE *fd_log) {
   }
 }
 
-void recibir_media(int tuberia[2], FILE *fd_log){
+void recibir_media(int tuberia[2]){
   char media[2] = {0};
 
   read(tuberia[LEER], media, sizeof(media));
@@ -139,6 +141,7 @@ void recibir_media(int tuberia[2], FILE *fd_log){
 
 void manejador(int signal) {
   int i;
+  fprintf(fd_log, "Interrupción voluntaria con Ctrl+C.\nEliminado procesos y borrando archivos\n");
   printf("\n[MANAGER] Eliminando procesos ...\n");
   for (i=0; i < 3; i++) {
     if (g_pid[i] != 0) {
@@ -148,6 +151,8 @@ void manejador(int signal) {
 
   printf("[MANAGER] Todos muertos, llamando a [PD] para que limpie ...\n");
   crear_y_esperar_pd();
+
+  fclose(fd_log);
 
   exit(EXIT_SUCCESS);
 }
