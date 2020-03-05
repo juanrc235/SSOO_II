@@ -1,3 +1,13 @@
+/*******************************************************************************
+* Project         : Práctica de laboratorio 1 de SSOO II
+*
+* Program name    : pb.c
+*
+* Purpose         : Copia el modelo de examen correspondiente a cada alumno en
+*                   su directorio correspondiente.
+*
+*******************************************************************************/
+
 #define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -1,3 +1,18 @@
+/*******************************************************************************
+* Project         : Práctica de laboratorio 1 de SSOO II
+*
+* Program name    : manager.c
+*
+* Purpose         : Crea el pa y espera su finalización. Después, crea pb y pc
+*                   simultaneaménte y espera su finalización. También, mantiene
+*                   un manejador de señal para controlar la señal Ctrl+C. Si se
+*                   recibe dicha señal se crea el proceso pd y espera su fina-
+*                   lización. Finalmente, recibe la nota media de pc. Matiene
+*                   un log del sistema donde se registran los eventos más impor-
+*                   tantes del sistema.
+*
+*******************************************************************************/
+
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,7 +53,6 @@ int main(int argc, char const *argv[]) {
   crear_y_esperar_pa();
 
   crear_y_esperar_pb_y_pc(tuberia);
-
   recibir_media(tuberia);
 
   fprintf(fd_log, "******* FIN DE PROGRAMA *********\n");

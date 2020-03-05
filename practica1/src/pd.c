@@ -1,3 +1,12 @@
+/*******************************************************************************
+* Project         : Práctica de laboratorio 1 de SSOO II
+*
+* Program name    : pd.c
+*
+* Purpose         : Eliminar todo los fichero y directorios generados.
+*
+*******************************************************************************/
+
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>

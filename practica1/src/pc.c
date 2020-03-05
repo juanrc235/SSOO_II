@@ -1,3 +1,14 @@
+/*******************************************************************************
+* Project         : Práctica de laboratorio 1 de SSOO II
+*
+* Program name    : pc.c
+*
+* Purpose         : Crea un fichero de texto con la nota necesaria para aprobar
+*                   en el directorio de cada alumno. Por otro lado, calcula la
+*                   nota media de la clase y la manda al manager.c
+*
+*******************************************************************************/
+
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,3 +1,13 @@
+/*******************************************************************************
+* Project         : Práctica de laboratorio 1 de SSOO II
+*
+* Program name    : pa.c
+*
+* Purpose         : Crea un directorio para cada alumno que se encuentra en el
+*                   fichero de datos.
+*
+*******************************************************************************/
+
 #define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>
