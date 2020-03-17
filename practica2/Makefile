@@ -12,11 +12,8 @@ all: dirs main
 dirs:
 	mkdir -p $(DIROBJ) $(DIREXE)
 
-main: $(DIROBJ)main.o
-	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
-
-$(DIROBJ)%.o: $(DIRSRC)%.cpp
-	$(CC) $(CFLAGS) $^ -o $@
+main:
+	g++ src/*.cpp -o $(DIREXE)main
 
 clean :
 	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~
