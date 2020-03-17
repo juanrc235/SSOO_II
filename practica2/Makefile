@@ -19,4 +19,4 @@ clean :
 	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~
 
 run:
-	$(DIREXE)main 8-libros-txt/prueba
+	$(DIREXE)main casa 8-libros-txt/prueba
