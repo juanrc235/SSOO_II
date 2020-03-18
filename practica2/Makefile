@@ -19,4 +19,4 @@ clean :
 	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~
 
 run:
-	$(DIREXE)main casa "8-libros-txt/17 LEYES DEL TRABAJO EN EQUIPO.txt"
+	$(DIREXE)main casa "fichero_casos.txt" 2
