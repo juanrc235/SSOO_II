@@ -10,11 +10,10 @@ void escanear_documento (std::string fichero, int inicio, int final, Resultado r
   int nlinea = 0;
   std::string strlinea;
   std::ifstream fd (fichero);
-
-  fd.seekg(inicio, std::ios::beg);
+  
   if (fd.is_open()) {
     while ( getline (fd, strlinea) ) {
-      if ( std::regex_search(strlinea, p) ) {
+      if ( std::regex_search(strlinea, p) && nlinea >= inicio) {
         resultado.add_resultado(nlinea, std::regex_replace(strlinea, p, "\e[3m$&\e[0m"));
       }
       nlinea++;
@@ -32,13 +31,11 @@ void escanear_documento (std::string fichero, int inicio, int final, Resultado r
 int main(int argc, char const *argv[]) {
 
   std::string palabra(argv[1]);
-
-
   std::string strlinea;
   std::ifstream fd (argv[2]);
   int nlineas = std::count(std::istreambuf_iterator<char>(fd), std::istreambuf_iterator<char>(),'\n');
 
-  std::string reg_exp = palabra + "[ .,?!]";
+  std::string reg_exp = palabra + "[ .,?!)]";
   std::regex p(reg_exp, std::regex_constants::ECMAScript | std::regex_constants::icase);
 
   Resultado resultado(1, 0, 5);
