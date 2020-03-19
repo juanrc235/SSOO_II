@@ -13,10 +13,10 @@ dirs:
 	mkdir -p $(DIROBJ) $(DIREXE)
 
 main:
-	g++ src/*.cpp -o $(DIREXE)main
+	g++ src/*.cpp -o $(DIREXE)SSOOIIGLE -lpthread -std=c++11
 
 clean :
 	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~
 
 run:
-	$(DIREXE)main casa "fichero_casos.txt" 2
+	$(DIREXE)SSOOIIGLE casa "fichero_casos.txt" 2

@@ -2,15 +2,14 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
-#include <string.h>
-#include <algorithm>
+#include <thread>
 
 void escanear_documento (std::string fichero, int inicio, int final, Resultado resultado, std::regex p) {
 
   int nlinea = 0;
   std::string strlinea;
   std::ifstream fd (fichero);
-  
+
   if (fd.is_open()) {
     while ( getline (fd, strlinea) ) {
       if ( std::regex_search(strlinea, p) && nlinea >= inicio) {
@@ -35,13 +34,18 @@ int main(int argc, char const *argv[]) {
   std::ifstream fd (argv[2]);
   int nlineas = std::count(std::istreambuf_iterator<char>(fd), std::istreambuf_iterator<char>(),'\n');
 
+  /* Expresion regular para encontrar la palabra */
   std::string reg_exp = palabra + "[ .,?!)]";
   std::regex p(reg_exp, std::regex_constants::ECMAScript | std::regex_constants::icase);
 
   Resultado resultado(1, 0, 5);
-  escanear_documento(argv[2], 0, 5, resultado, p);
   Resultado resultado1(2, 5, nlineas);
-  escanear_documento(argv[2], 5, nlineas, resultado1, p);
+
+  std::thread hilo1( escanear_documento, argv[2], 0, 5, resultado, p );
+  std::thread hilo2( escanear_documento, argv[2], 5, nlineas, resultado1, p );
+
+  hilo1.join();
+  hilo2.join();
 
   std::cout << resultado.devolver_resultado() << std::endl;
   std::cout << resultado1.devolver_resultado() << std::endl;
