@@ -3,52 +3,105 @@
 #include <fstream>
 #include <regex>
 #include <thread>
+#include <vector>
+#include <algorithm>
 
-void escanear_documento (std::string fichero, int inicio, int final, Resultado resultado, std::regex p) {
+void escanear_documento (std::string fichero, int inicio, int final, std::regex p) {
 
   int nlinea = 0;
   std::string strlinea;
   std::ifstream fd (fichero);
 
-  if (fd.is_open()) {
-    while ( getline (fd, strlinea) ) {
-      if ( std::regex_search(strlinea, p) && nlinea >= inicio) {
-        resultado.add_resultado(nlinea, std::regex_replace(strlinea, p, "\e[3m$&\e[0m"));
-      }
-      nlinea++;
-      if (nlinea == final) {
-        break;
-      }
+  while ( getline (fd, strlinea) ) {
+    if ( std::regex_search(strlinea, p) && nlinea >= inicio) {
+      //resultado.add_resultado(nlinea, std::regex_replace(strlinea, p, "\e[3m$&\e[0m"));
+      std::cout << "Línea " + std::to_string(nlinea) + " :: " +
+                    std::regex_replace(strlinea, p, "\e[3m$&\e[0m") << '\n';
     }
-    fd.close();
-  } else {
-    std::cout << "[ERROR] No se puede abrir el fichero";
+    nlinea++;
+    if (nlinea == final) {
+      break;
+    }
   }
+  fd.close();
+}
 
+void imprimir (int i) {
+  std::cout << "Hilo :: " + std::to_string(i) << std::endl;
 }
 
 int main(int argc, char const *argv[]) {
 
   std::string palabra(argv[1]);
-  std::string strlinea;
-  std::ifstream fd (argv[2]);
-  int nlineas = std::count(std::istreambuf_iterator<char>(fd), std::istreambuf_iterator<char>(),'\n');
+  std::string ruta(argv[2]);
+  std::stringstream str;
+  str <<  argv[3];
+  int nhilos;
+  str >> nhilos;
 
-  /* Expresion regular para encontrar la palabra */
-  std::string reg_exp = palabra + "[ .,?!)]";
-  std::regex p(reg_exp, std::regex_constants::ECMAScript | std::regex_constants::icase);
+  std::cout << "[MANAGER] \nFichero: " + ruta + "\n" +
+                          "Parabra: " + palabra + "\n" +
+                          "Nº hilos: " + std::to_string(nhilos) << std::endl;
 
-  Resultado resultado(1, 0, 5);
-  Resultado resultado1(2, 5, nlineas);
+  std::ifstream fd (ruta);
+  if (fd.is_open()) {
 
-  std::thread hilo1( escanear_documento, argv[2], 0, 5, resultado, p );
-  std::thread hilo2( escanear_documento, argv[2], 5, nlineas, resultado1, p );
+    int nlineas = std::count(std::istreambuf_iterator<char>(fd), std::istreambuf_iterator<char>(),'\n'), i;
+    int nlineas_hilo = nlineas/nhilos, linea_i = 0;
+    int linea_f = nlineas_hilo;
 
-  hilo1.join();
-  hilo2.join();
+    std::cout << "[MANAGER] El fichero contiene " + std::to_string(nlineas) +
+                 " líneas :: " + std::to_string(nlineas_hilo) + " líneas por hilo" << std::endl;
 
-  std::cout << resultado.devolver_resultado() << std::endl;
-  std::cout << resultado1.devolver_resultado() << std::endl;
+    /* Expresion regular para encontrar la palabra */
+    std::string reg_exp = palabra + "[ .,?!)]";
+    std::regex p(reg_exp, std::regex_constants::ECMAScript | std::regex_constants::icase);
+    std::string strlinea;
+
+    /* lista de objetos Resultado, uno por hilo */
+    std::vector<Resultado> vector_resultado;
+
+    /* lista de hilos */
+    std::vector<std::thread> vector_hilos;
+
+    std::cout << "[MANAGER] Reparto de tareas #" << std::endl;
+    /* Creamos hilos y resultados*/
+    for (i = 1; i <= nhilos; i++) {
+
+      vector_resultado.push_back(Resultado (i, linea_i, linea_f));
+
+      vector_hilos.push_back(std::thread(escanear_documento, ruta, linea_i, linea_f, p ));
+
+      std::cout << "[MANAGER] Hilo " + std::to_string(i) + " :: líneas "
+                                     + std::to_string(linea_i) + " - "
+                                     + std::to_string(linea_f) << std::endl;
+
+      linea_i = linea_f + 1;
+      linea_f += nlineas_hilo;
+      if (i == nhilos - 1 ) {
+        linea_f = nlineas;
+      }
+
+    }
+
+    std::cout << "[MANAGER] Esperando a la terminación de los hilos #" << std::endl;
+    /* Esperamos a los hilos */
+    for (std::thread & hilo : vector_hilos) {
+  		if (hilo.joinable()){
+        hilo.join();
+      }
+  	}
+    std::cout << "[MANAGER] Todos los hilos han acabado #" << std::endl;
+
+    std::cout << "[MANAGER] Resultados #" << std::endl;
+    /* Mostrar resultados */
+    for (Resultado & result : vector_resultado) {
+  		std::cout << result.devolver_resultado() << std::endl;
+  	}
+
+  } else {
+    std::cout << "No se puede abrir el archivo: " + ruta <<std::endl;
+  }
 
   return 0;
 }

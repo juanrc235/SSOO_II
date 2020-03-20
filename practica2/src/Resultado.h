@@ -6,9 +6,9 @@
 class Resultado {
 
   private:
-  int num_hilo, l_inicio, l_final;
-  std::list<Linea> apariciones;
-  std::list<Linea>::iterator itr;
+    int num_hilo, l_inicio, l_final;
+    std::list<Linea> apariciones;
+    std::list<Linea>::iterator itr;
 
   public:
     Resultado (int num_hilo, int l_inicio, int l_final);

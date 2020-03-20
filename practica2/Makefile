@@ -13,7 +13,7 @@ dirs:
 	mkdir -p $(DIROBJ) $(DIREXE)
 
 main:
-	g++ src/*.cpp -o $(DIREXE)SSOOIIGLE -lpthread -std=c++11
+	g++ src/*.cpp -o $(DIREXE)SSOOIIGLE -pthread -std=c++11
 
 clean :
 	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~

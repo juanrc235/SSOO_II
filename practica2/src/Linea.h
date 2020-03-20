@@ -4,8 +4,8 @@
 class Linea {
 
   private:
-  int nlinea;
-  std::string strlinea;
+    int nlinea;
+    std::string strlinea;
 
   public:
     Linea (int nlinea, std::string strlinea);
