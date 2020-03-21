@@ -6,17 +6,18 @@
 #include <vector>
 #include <algorithm>
 
-void escanear_documento (std::string fichero, int inicio, int final, std::regex p) {
+void escanear_documento (std::string fichero, int inicio, int final, int hilo, std::regex p) {
 
   int nlinea = 0;
   std::string strlinea;
   std::ifstream fd (fichero);
+  Resultado resultado (hilo, inicio, final);
 
   while ( getline (fd, strlinea) ) {
     if ( std::regex_search(strlinea, p) && nlinea >= inicio) {
-      //resultado.add_resultado(nlinea, std::regex_replace(strlinea, p, "\e[3m$&\e[0m"));
-      std::cout << "Línea " + std::to_string(nlinea) + " :: " +
-                    std::regex_replace(strlinea, p, "\e[3m$&\e[0m") << '\n';
+      resultado.add_resultado(nlinea, std::regex_replace(strlinea, p, "\e[3m$&\e[0m"));
+      //std::cout << "Línea " + std::to_string(nlinea) + " :: " +
+                    //std::regex_replace(strlinea, p, "\e[3m$&\e[0m") << '\n';
     }
     nlinea++;
     if (nlinea == final) {
@@ -24,6 +25,7 @@ void escanear_documento (std::string fichero, int inicio, int final, std::regex 
     }
   }
   fd.close();
+  std::cout << resultado.devolver_resultado() << std::endl;
 }
 
 void imprimir (int i) {
@@ -51,7 +53,7 @@ int main(int argc, char const *argv[]) {
     int linea_f = nlineas_hilo;
 
     std::cout << "[MANAGER] El fichero contiene " + std::to_string(nlineas) +
-                 " líneas :: " + std::to_string(nlineas_hilo) + " líneas por hilo" << std::endl;
+                 " líneas :: " + std::to_string(nlineas_hilo) + " líneas por hiloconv" << std::endl;
 
     /* Expresion regular para encontrar la palabra */
     std::string reg_exp = palabra + "[ .,?!)]";
@@ -68,13 +70,7 @@ int main(int argc, char const *argv[]) {
     /* Creamos hilos y resultados*/
     for (i = 1; i <= nhilos; i++) {
 
-      vector_resultado.push_back(Resultado (i, linea_i, linea_f));
-
-      vector_hilos.push_back(std::thread(escanear_documento, ruta, linea_i, linea_f, p ));
-
-      std::cout << "[MANAGER] Hilo " + std::to_string(i) + " :: líneas "
-                                     + std::to_string(linea_i) + " - "
-                                     + std::to_string(linea_f) << std::endl;
+      vector_hilos.push_back(std::thread(escanear_documento, ruta, linea_i, linea_f, i, p));
 
       linea_i = linea_f + 1;
       linea_f += nlineas_hilo;
@@ -92,12 +88,6 @@ int main(int argc, char const *argv[]) {
       }
   	}
     std::cout << "[MANAGER] Todos los hilos han acabado #" << std::endl;
-
-    std::cout << "[MANAGER] Resultados #" << std::endl;
-    /* Mostrar resultados */
-    for (Resultado & result : vector_resultado) {
-  		std::cout << result.devolver_resultado() << std::endl;
-  	}
 
   } else {
     std::cout << "No se puede abrir el archivo: " + ruta <<std::endl;

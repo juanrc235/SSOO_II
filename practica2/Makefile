@@ -20,3 +20,6 @@ clean :
 
 run:
 	$(DIREXE)SSOOIIGLE casa "fichero_casos.txt" 2
+
+run2:
+	$(DIREXE)SSOOIIGLE casa "8-libros-txt/Abe Shana - La última sirena.txt" 5
