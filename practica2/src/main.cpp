@@ -5,9 +5,12 @@
 #include <thread>
 #include <vector>
 #include <algorithm>
+#include <chrono>
 
 /* lista de objetos Resultado, uno por hilo */
 auto resultados = std::map<int, Resultado> {};
+bool continuar = true;
+
 void escanear_documento (std::string fichero, int inicio, int final, int hilo, std::regex p) {
 
   int nlinea = 0;
@@ -18,6 +21,7 @@ void escanear_documento (std::string fichero, int inicio, int final, int hilo, s
   while ( getline (fd, strlinea) ) {
     if ( std::regex_search(strlinea, p) &&  nlinea >= inicio) {
       resultado.add_resultado(nlinea, std::regex_replace(strlinea, p, "\e[3m$&\e[0m"));
+    
     }
     nlinea++;
     if (nlinea == final) {
@@ -33,6 +37,7 @@ void mostrar_banner() {
   std::string strlinea;
   while ( getline (fd, strlinea) ) {
     std::cout << strlinea << '\n';
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
   fd.close();
 }
@@ -54,9 +59,9 @@ int main(int argc, char const *argv[]) {
 
   mostrar_banner();
 
-  std::cout << "\nFichero: " + ruta + "\n" +
-               "Parabra: " + palabra + "\n" +
-               "Nº hilos: " + std::to_string(nhilos) << std::endl;
+  std::cout << "\n[MANAGER] Fichero: " + ruta + "\n" +
+               "[MANAGER] Parabra: " + palabra + "\n" +
+               "[MANAGER] Nº hilos: " + std::to_string(nhilos) << std::endl;
 
   int nlineas = std::count(std::istreambuf_iterator<char>(fd), std::istreambuf_iterator<char>(),'\n'), i;
   int nlineas_hilo = nlineas/nhilos, linea_i = 0;
@@ -86,7 +91,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  std::cout << "[MANAGER] Esperando a la terminación de los hilos" << std::endl;
+  std::cout << "[MANAGER] Esperando a la terminación de los hilos " << std::endl;
   /* Esperamos a los hilos */
   for (std::thread & hilo : vector_hilos) {
 		if (hilo.joinable()){
@@ -94,11 +99,12 @@ int main(int argc, char const *argv[]) {
     }
 	}
 
-
   std::cout << "\n############################### Resultados #######################################\n" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
   for (const auto &entry: resultados) {
 		auto key = entry.second;
 	  std::cout << key.devolver_resultado() << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 
   return 0;
