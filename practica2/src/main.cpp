@@ -6,6 +6,9 @@
 #include <vector>
 #include <algorithm>
 
+/* lista de objetos Resultado, uno por hilo */
+auto resultados = std::map<int, Resultado> {};
+
 void escanear_documento (std::string fichero, int inicio, int final, int hilo, std::regex p) {
 
   int nlinea = 0;
@@ -14,10 +17,8 @@ void escanear_documento (std::string fichero, int inicio, int final, int hilo, s
   Resultado resultado (hilo, inicio, final);
 
   while ( getline (fd, strlinea) ) {
-    if ( std::regex_search(strlinea, p) && nlinea >= inicio) {
+    if ( std::regex_search(strlinea, p) &&  nlinea >= inicio) {
       resultado.add_resultado(nlinea, std::regex_replace(strlinea, p, "\e[3m$&\e[0m"));
-      //std::cout << "Línea " + std::to_string(nlinea) + " :: " +
-                    //std::regex_replace(strlinea, p, "\e[3m$&\e[0m") << '\n';
     }
     nlinea++;
     if (nlinea == final) {
@@ -25,11 +26,7 @@ void escanear_documento (std::string fichero, int inicio, int final, int hilo, s
     }
   }
   fd.close();
-  std::cout << resultado.devolver_resultado() << std::endl;
-}
-
-void imprimir (int i) {
-  std::cout << "Hilo :: " + std::to_string(i) << std::endl;
+  resultados.insert({hilo, resultado});
 }
 
 int main(int argc, char const *argv[]) {
@@ -53,15 +50,12 @@ int main(int argc, char const *argv[]) {
     int linea_f = nlineas_hilo;
 
     std::cout << "[MANAGER] El fichero contiene " + std::to_string(nlineas) +
-                 " líneas :: " + std::to_string(nlineas_hilo) + " líneas por hiloconv" << std::endl;
+                 " líneas :: " + std::to_string(nlineas_hilo) + " líneas por hilo #" << std::endl;
 
     /* Expresion regular para encontrar la palabra */
     std::string reg_exp = palabra + "[ .,?!)]";
     std::regex p(reg_exp, std::regex_constants::ECMAScript | std::regex_constants::icase);
     std::string strlinea;
-
-    /* lista de objetos Resultado, uno por hilo */
-    std::vector<Resultado> vector_resultado;
 
     /* lista de hilos */
     std::vector<std::thread> vector_hilos;
@@ -88,6 +82,12 @@ int main(int argc, char const *argv[]) {
       }
   	}
     std::cout << "[MANAGER] Todos los hilos han acabado #" << std::endl;
+
+    std::cout << "[MANAGER] Resultados #" << std::endl;
+    for (const auto &entry: resultados) {
+  		auto key = entry.second;
+  	  std::cout << key.devolver_resultado() << std::endl;
+  	}
 
   } else {
     std::cout << "No se puede abrir el archivo: " + ruta <<std::endl;
