@@ -11,7 +11,38 @@
 auto resultados = std::map<int, Resultado> {};
 bool continuar = true;
 
-void escanear_documento (std::string fichero, int inicio, int final, int hilo, std::regex p) {
+std::string parsear_resultado(std::string linea, std::regex p, std::string palabra) {
+  std::string str_bonita;
+  unsigned int pos = 0, size;
+
+  std::regex p1(palabra, std::regex_constants::ECMAScript);
+
+  std::istringstream iss(linea);
+  std::vector<std::string> results(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
+
+  for(auto it = results.begin(); it != results.end(); ++it) {
+
+    if ( std::regex_search((*it), p1) ) {
+      break;
+    }
+    pos++;
+  }
+
+  size = results.size();
+  if (pos == 0 && size >= 2) {
+    str_bonita = "... " + results[pos] + " " + results[pos + 1] + " ...";
+  } else if (pos == size - 1 && size >=2) {
+    str_bonita = "... " + results[pos-1] + " " + results[pos] + " ...";
+  } else if (size >= 3) {
+    str_bonita = "... " + results[pos-1] + " " + results[pos] + " " + results[pos+1] + " ...";
+  } else {
+    str_bonita = linea;
+  }
+
+  return str_bonita;
+}
+
+void escanear_documento (std::string fichero, int inicio, int final, int hilo, std::regex p, std::string palabra) {
 
   int nlinea = 0;
   std::string strlinea;
@@ -20,8 +51,8 @@ void escanear_documento (std::string fichero, int inicio, int final, int hilo, s
 
   while ( getline (fd, strlinea) ) {
     if ( std::regex_search(strlinea, p) &&  nlinea >= inicio) {
-      resultado.add_resultado(nlinea, std::regex_replace(strlinea, p, "\e[3m$&\e[0m"));
-    
+      strlinea = std::regex_replace(parsear_resultado(strlinea, p, palabra), p, "\e[3m$&\e[0m");
+      resultado.add_resultado(nlinea, strlinea);
     }
     nlinea++;
     if (nlinea == final) {
@@ -71,8 +102,8 @@ int main(int argc, char const *argv[]) {
                " líneas :: " + std::to_string(nlineas_hilo) + " líneas por hilo" << std::endl;
 
   /* Expresion regular para encontrar la palabra */
-  std::string reg_exp = palabra + "[ .,?!)]";
-  std::regex p(reg_exp, std::regex_constants::ECMAScript | std::regex_constants::icase);
+  //std::regex p(reg_exp, std::regex_constants::ECMAScript | std::regex_constants::icase);
+  std::regex p(palabra + "[ .,?!)]", std::regex_constants::ECMAScript);
   std::string strlinea;
 
   /* lista de hilos */
@@ -82,7 +113,7 @@ int main(int argc, char const *argv[]) {
   /* Creamos hilos y resultados*/
   for (i = 1; i <= nhilos; i++) {
 
-    vector_hilos.push_back(std::thread(escanear_documento, ruta, linea_i, linea_f, i, p));
+    vector_hilos.push_back(std::thread(escanear_documento, ruta, linea_i, linea_f, i, p, palabra));
 
     linea_i = linea_f + 1;
     linea_f += nlineas_hilo;
