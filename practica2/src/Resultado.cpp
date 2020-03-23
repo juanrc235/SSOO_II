@@ -13,6 +13,10 @@ void Resultado::add_resultado(int nlinea, std::string strlinea){
   this->apariciones.insert(itr, linea_aparicion);
 }
 
+int Resultado::get_subtotal() {
+  return this->apariciones.size();
+}
+
 std::string Resultado::devolver_resultado() {
   std::string cabecera = "[HILO " +
                           std::to_string(this->num_hilo) +

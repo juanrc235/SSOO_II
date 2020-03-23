@@ -13,6 +13,7 @@ class Resultado {
   public:
     Resultado (int num_hilo, int l_inicio, int l_final);
     void add_resultado(int n_linea, std::string linea);
+    int get_subtotal();
     std::string devolver_resultado();
 
 };

@@ -6,9 +6,11 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <mutex>
 
 /* lista de objetos Resultado, uno por hilo */
 auto resultados = std::map<int, Resultado> {};
+std::mutex sem_map;
 bool continuar = true;
 
 std::string parsear_resultado(std::string linea, std::regex p, std::string palabra) {
@@ -21,7 +23,6 @@ std::string parsear_resultado(std::string linea, std::regex p, std::string palab
   std::vector<std::string> results(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
 
   for(auto it = results.begin(); it != results.end(); ++it) {
-
     if ( std::regex_search((*it), p1) ) {
       break;
     }
@@ -51,7 +52,8 @@ void escanear_documento (std::string fichero, int inicio, int final, int hilo, s
 
   while ( getline (fd, strlinea) ) {
     if ( std::regex_search(strlinea, p) &&  nlinea >= inicio) {
-      strlinea = std::regex_replace(parsear_resultado(strlinea, p, palabra), p, "\e[3m$&\e[0m");
+      //strlinea = std::regex_replace(parsear_resultado(strlinea, p, palabra), p, "\e[3;1;31m$&\e[0m");
+      strlinea = std::regex_replace(strlinea, p, "\e[3;1;31m$&\e[0m");
       resultado.add_resultado(nlinea, strlinea);
     }
     nlinea++;
@@ -60,18 +62,32 @@ void escanear_documento (std::string fichero, int inicio, int final, int hilo, s
     }
   }
   fd.close();
+
+  sem_map.lock();
   resultados.insert({hilo, resultado});
+  sem_map.unlock();
 }
 
 void mostrar_banner() {
   std::ifstream fd ("logo.txt");
-  std::string strlinea;
-  while ( getline (fd, strlinea) ) {
-    std::cout << strlinea << '\n';
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+  if (!fd.is_open()) {
+    std::cout << "No se escuentra el fichero del logo :/"<<std::endl;
+  } else {
+    std::string strlinea;
+    while ( getline (fd, strlinea) ) {
+      std::cout << strlinea << std::endl;
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+    fd.close();
   }
-  fd.close();
+
 }
+
+/* TODO
+  - control de errores argumentos
+  - hacer main.cpp más OO en main
+*/
 
 int main(int argc, char const *argv[]) {
 
@@ -103,7 +119,7 @@ int main(int argc, char const *argv[]) {
 
   /* Expresion regular para encontrar la palabra */
   //std::regex p(reg_exp, std::regex_constants::ECMAScript | std::regex_constants::icase);
-  std::regex p(palabra + "[ .,?!)]", std::regex_constants::ECMAScript);
+  std::regex p("[¿!-( ]" + palabra + "[ .,:;-?!)]", std::regex_constants::ECMAScript | std::regex_constants::icase);
   std::string strlinea;
 
   /* lista de hilos */
@@ -130,13 +146,18 @@ int main(int argc, char const *argv[]) {
     }
 	}
 
+  int total = 0;
   std::cout << "\n############################### Resultados #######################################\n" << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   for (const auto &entry: resultados) {
 		auto key = entry.second;
 	  std::cout << key.devolver_resultado() << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    total+= key.get_subtotal();
 	}
+  std::cout << "[MANAGER] La palabra \e[3;1;31m" +palabra +
+               "\e[0m aparece \e[3;1;32m" + std::to_string(total) +
+               "\e[0m veces" << std::endl;
 
   return 0;
 }
