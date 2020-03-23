@@ -87,6 +87,8 @@ void mostrar_banner() {
 /* TODO
   - control de errores argumentos
   - hacer main.cpp más OO en main
+  - dividirlo .... p1 palabra p2 ...
+  - destructores
 */
 
 int main(int argc, char const *argv[]) {
