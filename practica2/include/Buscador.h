@@ -1,6 +1,9 @@
 #include "Resultado.h"
-#include <string>
-#include <map>
+#include <fstream>
+#include <regex>
+#include <thread>
+#include <vector>
+#include <mutex>
 
 class Buscador {
 
@@ -9,14 +12,20 @@ class Buscador {
     std::string fichero;
     int nhilos;
     int total_aparciones;
+    std::mutex sem_map;
     std::map<int, Resultado> resultados;
+    std::vector<std::thread> vector_hilos;
+    std::regex p;
+    std::ifstream fd;
     void esperar_hilos();
-    void repatir_tareas();
+    void repartir_tareas();
+    void escanear_documento (int inicio, int final, int hilo);
+    void mostrar_banner();
 
   public:
     Buscador (std::string palabra, std::string fichero, int nhilos);
     int buscar();
     std::map<int, Resultado>  get_resultados();
-    int get_apariciones();
+    std::string get_apariciones();
 
 };

@@ -1,13 +1,14 @@
 #include <string>
 
-#define RESET "\e[0m"
-#define RED "\e[31m"
-#define GREEN "\e[32m"
-#define YELLOW "\e[33m"
-#define BLUE "\e[34m"
-#define MAGENTA "\e[35m"
-#define CYAN "\e[36m"
-#define WHITE "\e[31m"
+std::string RESET = "\e[0m";
+std::string RED = "\e[31m";
+std::string GREEN = "\e[32m";
+std::string YELLOW = "\e[33m";
+std::string BLUE = "\e[34m";
+std::string MAGENTA = "\e[35m";
+std::string CYAN = "\e[36m";
+std::string WHITE = "\e[31m";
+std::string MANAGER = MAGENTA + "[MANAGER]" + RESET;
 
 std::string banner1 = "\e[34m███████╗███████╗\e[31m ██████╗\e[33m  ██████╗\e[34m ██╗██╗\e[32m ██████╗ ██╗     \e[31m███████╗\e[0m";
 std::string banner2 = "\e[34m██╔════╝██╔════╝\e[31m██╔═══██╗\e[33m██╔═══██╗\e[34m██║██║\e[32m██╔════╝ ██║     \e[31m██╔════╝\e[0m";
