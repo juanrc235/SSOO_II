@@ -1,4 +1,5 @@
 #include "Resultado.h"
+#include "Banner.h"
 #include <iostream>
 #include <fstream>
 #include <regex>
@@ -11,7 +12,6 @@
 /* lista de objetos Resultado, uno por hilo */
 auto resultados = std::map<int, Resultado> {};
 std::mutex sem_map;
-bool continuar = true;
 
 std::string parsear_resultado(std::string linea, std::regex p, std::string palabra) {
   std::string str_bonita;
@@ -69,18 +69,18 @@ void escanear_documento (std::string fichero, int inicio, int final, int hilo, s
 }
 
 void mostrar_banner() {
-  std::ifstream fd ("logo.txt");
 
-  if (!fd.is_open()) {
-    std::cout << "No se escuentra el fichero del logo :/"<<std::endl;
-  } else {
-    std::string strlinea;
-    while ( getline (fd, strlinea) ) {
-      std::cout << strlinea << std::endl;
-      std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    }
-    fd.close();
-  }
+  std::cout << banner1 << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::cout << banner2 << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::cout << banner3 << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::cout << banner4 << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::cout << banner5 << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::cout << banner6 << std::endl;
 
 }
 
