@@ -9,6 +9,16 @@
 #include <chrono>
 #include <mutex>
 
+std::string MANAGER = "\e[35m[MANAGER]\e[0m";
+#define  RESET "\e[0m"
+#define  RED "\e[31m"
+#define  GREEN "\e[32m"
+#define  YELLOW "\e[33m"
+#define  BLUE "\e[34m"
+#define  MAGENTA "\e[35m"
+#define  CYAN "\e[36m"
+#define  WHITE "\e[31m"
+
 Buscador::Buscador (std::string palabra, std::string fichero, int nhilos) {
   this->palabra = palabra;
   this->fichero = fichero;
@@ -108,5 +118,7 @@ void Buscador::mostrar_banner() {
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   std::cout << banner5 << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  std::cout << banner6 + "\n" << std::endl;
+  std::cout << banner6 << std::endl;
+  std::cout << "" << std::endl;
+
 }

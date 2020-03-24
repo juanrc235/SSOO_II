@@ -1,8 +1,13 @@
 #include "Buscador.h"
 
+/* TODO
+  - control de errores argumentos
+  - dividirlo .... p1 palabra p2 ...
+  - destructores
+*/
+
 int main(int argc, char const *argv[]) {
 
-  /*** CONTROLAR ARGV ***/
   std::string palabra(argv[1]);
   std::string fichero(argv[2]);
   std::stringstream str;
