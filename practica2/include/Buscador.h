@@ -27,5 +27,6 @@ class Buscador {
     int buscar();
     std::map<int, Resultado>  get_resultados();
     std::string get_apariciones();
+    bool test_file();
 
 };

@@ -1,8 +1,9 @@
 #include "Resultado.h"
 #include <string>
 
-std::string CYAN = "\e[36m";
-std::string BLUE = "\e[34m";
+std::string CYAN = "\e[1;36m";
+std::string BLUE = "\e[1;34m";
+std::string GREEN_B = "\e[1;32m";
 std::string GREEN = "\e[32m";
 std::string RESET = "\e[0m";
 
@@ -29,8 +30,8 @@ std::string Resultado::devolver_resultado() {
   std::string salida;
   Linea tmp();
   for(this->itr = apariciones.begin(); this->itr != apariciones.end(); this->itr++) {
-    salida += cabecera + GREEN + " :: línea " + std::to_string((*itr).get_nlinea())
-                       + " :: " + RESET + (*itr).get_strlinea() + "\n";
+    salida += cabecera + GREEN + " :: línea " + GREEN_B + std::to_string((*itr).get_nlinea())
+                       + RESET + GREEN + " :: " + RESET + (*itr).get_strlinea() + "\n";
   }
   return salida;
 }

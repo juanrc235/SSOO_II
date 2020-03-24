@@ -88,7 +88,7 @@ int Buscador::buscar() {
   std::cout << MANAGER + " Fichero: " + this->fichero + "\n" +
                MANAGER + " Parabra: " + this->palabra + "\n" +
                MANAGER + " Nº hilos: " + std::to_string(this->nhilos) + "\n" << std::endl;
-
+              
   this->repartir_tareas();
   this->esperar_hilos();
   return 0;
@@ -103,6 +103,10 @@ std::string Buscador::get_apariciones(){
              "\e[0m aparece \e[3;1;32m" + std::to_string(this->total_aparciones) +
              "\e[0m veces";
   return str;
+}
+
+bool Buscador::test_file() {
+  return this->fd.is_open();
 }
 
 void Buscador::mostrar_banner() {
