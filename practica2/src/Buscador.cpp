@@ -23,7 +23,7 @@ Buscador::Buscador (std::string palabra, std::string fichero, int nhilos) {
   this->palabra = palabra;
   this->fichero = fichero;
   this->nhilos = nhilos;
-  this->p = std::regex("[¿!-( ]" + palabra + "[ .,:;-?!)]", std::regex_constants::ECMAScript | std::regex_constants::icase);
+  this->p = std::regex("\\b" + palabra + "\\b",  std::regex_constants::icase);
   this->fd = std::ifstream (this->fichero);
   this->total_aparciones = 0;
 }
@@ -39,7 +39,7 @@ void Buscador::esperar_hilos() {
 
 void Buscador::escanear_documento (int inicio, int final, int hilo) {
 
-  int nlinea = 0;
+  int nlinea = 1;
   std::string strlinea;
   std::ifstream fd (fichero);
   Resultado resultado (hilo, inicio, final);
@@ -52,7 +52,7 @@ void Buscador::escanear_documento (int inicio, int final, int hilo) {
       this->total_aparciones++;
     }
     nlinea++;
-    if (nlinea == final) {
+    if (nlinea == final + 1) {
       break;
     }
   }
@@ -88,7 +88,7 @@ int Buscador::buscar() {
   std::cout << MANAGER + " Fichero: " + this->fichero + "\n" +
                MANAGER + " Parabra: " + this->palabra + "\n" +
                MANAGER + " Nº hilos: " + std::to_string(this->nhilos) + "\n" << std::endl;
-              
+
   this->repartir_tareas();
   this->esperar_hilos();
   return 0;
