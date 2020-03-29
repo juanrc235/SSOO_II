@@ -21,6 +21,7 @@ class Buscador {
     void repartir_tareas();
     void escanear_documento (int inicio, int final, int hilo);
     void mostrar_banner();
+    std::string plinea(std::string strlinea);
 
   public:
     Buscador (std::string palabra, std::string fichero, int nhilos);
