@@ -3,7 +3,6 @@
 
 /* TODO
   - dividirlo .... p1 palabra p2 ...
-  - Arreglar reparto de líneas
 */
 
 int main(int argc, char const *argv[]) {

@@ -23,7 +23,7 @@ Buscador::Buscador (std::string palabra, std::string fichero, int nhilos) {
   this->palabra = palabra;
   this->fichero = fichero;
   this->nhilos = nhilos;
-  this->p = std::regex("\\b" + palabra + "\\b",  std::regex_constants::icase);
+  this->p = std::regex("\\b(" + this->palabra + ")\\b",  std::regex_constants::icase);
   this->fd = std::ifstream (this->fichero);
   this->total_aparciones = 0;
 }
@@ -41,14 +41,21 @@ void Buscador::escanear_documento (int inicio, int final, int hilo) {
 
   int nlinea = 1;
   std::string strlinea;
+  std::string strlinea2;
   std::ifstream fd (fichero);
   Resultado resultado (hilo, inicio, final);
 
   while ( getline (fd, strlinea) ) {
     if ( std::regex_search(strlinea, p) &&  nlinea >= inicio) {
-      //strlinea = std::regex_replace(parsear_resultado(strlinea, p, palabra), p, "\e[3;1;31m$&\e[0m");
-      strlinea = std::regex_replace(strlinea, this->p, "\e[3;1;31m$&\e[0m");
-      resultado.add_resultado(nlinea, strlinea);
+      //strlinea = std::regex_replace(strlinea, this->p, "\e[3;1;31m$&\e[0m");
+      std::regex s("([A-Za-z]+ )\\b(casa)\\b( [A-Za-z]+)",  std::regex_constants::icase);
+      strlinea2 = std::regex_replace(strlinea, s, "... $1\e[3;1;31m$2\e[0m$3 ... ", std::regex_constants::format_no_copy);
+      if (strlinea2.empty()) {
+        resultado.add_resultado(nlinea, strlinea);
+      } else {
+        resultado.add_resultado(nlinea, strlinea2);
+      }
+
       this->total_aparciones++;
     }
     nlinea++;
