@@ -40,37 +40,33 @@ void Buscador::esperar_hilos() {
 std::string Buscador::plinea(std::string strlinea) {
   std::string output;
 
-  std::regex s("(\\w+ )\\b(" + this->palabra + ")\\b( \\w+)",  std::regex_constants::icase);
+  for (int i = 0, len = strlinea.size(); i < len; i++) {
+        if (ispunct(strlinea[i])) {
+            strlinea.erase(i--, 1);
+            len = strlinea.size();
+        }
+    }
+
+  /* @@@@@ palabra @@@@@@ */
+  std::regex s("(\\w+ )(" + this->palabra + ")( \\w+)",  std::regex_constants::icase);
   output = std::regex_replace(strlinea, s, "... $1\e[3;1;31m$2\e[0m$3 ... ", std::regex_constants::format_no_copy);
 
+  /* palabra @@@@@@ */
   if (output.empty()) {
-    std::regex s("(\\w+ )\\b(casa),( \\w+)",  std::regex_constants::icase);
-    output = std::regex_replace(strlinea, s, "... $1\e[3;1;31m$2\e[0m,$3 ... ", std::regex_constants::format_no_copy);
+    std::regex s("\\b(" + this->palabra + ")( \\w+)",  std::regex_constants::icase);
+    output = std::regex_replace(strlinea, s, "\e[3;1;31m$1\e[0m$2 ... ", std::regex_constants::format_no_copy);
   }
 
+  /* @@@@@@ palabra  */
   if (output.empty()) {
-    std::regex s("(\\w+ )\\b(casa).",  std::regex_constants::icase);
-    output = std::regex_replace(strlinea, s, "... $1\e[3;1;31m$2\e[0m.", std::regex_constants::format_no_copy);
-  }
-
-  if (output.empty()) {
-    std::regex s("(\\w+ )\\b(casa)([?!\"-])",  std::regex_constants::icase);
-    output = std::regex_replace(strlinea, s, "... $1\e[3;1;31m$2\e[0m$3 ... ", std::regex_constants::format_no_copy);
-  }
-
-  if (output.empty()) {
-    std::regex s("(casa)\\b([,])( \\w+)",  std::regex_constants::icase);
-    output = std::regex_replace(strlinea, s, "\e[3;1;31m$1\e[0m$2$3 ...", std::regex_constants::format_no_copy);
-  }
-
-  if (output.empty()) {
-    std::regex s("(casa).",  std::regex_constants::icase);
-    output = std::regex_replace(strlinea, s, "\e[3;1;31m$1\e[0m.", std::regex_constants::format_no_copy);
-  }
-
-  if (output.empty()) {
-    std::regex s("(\\w+ )\\b(casa)\\b",  std::regex_constants::icase);
+    std::regex s("(\\w+ )(" + this->palabra + ")",  std::regex_constants::icase);
     output = std::regex_replace(strlinea, s, "... $1\e[3;1;31m$2\e[0m", std::regex_constants::format_no_copy);
+  }
+
+  /* palabra */
+  if (output.empty()) {
+    std::regex s("(" + this->palabra + ")",  std::regex_constants::icase);
+    output = std::regex_replace(strlinea, s, "... \e[3;1;31m$1\e[0m", std::regex_constants::format_no_copy);
   }
 
   if (output.empty()) {
@@ -90,7 +86,7 @@ void Buscador::escanear_documento (int inicio, int final, int hilo) {
 
   while ( getline (fd, strlinea) ) {
     if ( std::regex_search(strlinea, this->p) &&  nlinea >= inicio) {
-  
+
       strlinea2 = this->plinea(strlinea);
       resultado.add_resultado(nlinea, strlinea2);
 

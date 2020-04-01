@@ -22,3 +22,6 @@ run:
 
 run2:
 	$(DIREXE)SSOOIIGLE casa "8-libros-txt/Abe Shana - La última sirena.txt" 5
+
+run3:
+	$(DIREXE)SSOOIIGLE presidente "8-libros-txt/21 LEYES DEL LIDERAZGO - JOHN C. MAXWELL.txt" 5
