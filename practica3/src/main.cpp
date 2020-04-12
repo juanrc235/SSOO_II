@@ -1,4 +1,5 @@
 #include "Solicitud.hpp"
+#include "Taquilla.hpp"
 #include <iostream>
 #include <cstdlib>
 #include <vector>
@@ -22,6 +23,10 @@ int main(int argc, char const *argv[]) {
   for (Solicitud &s: vector_solicitudes) {
     std::cout << s.to_string() << std::endl;
   }
+
+  Taquilla t;
+
+  std::cout << t.dibujar_sala() << std::endl;
 
   return 0;
 }
