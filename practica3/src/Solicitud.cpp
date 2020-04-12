@@ -9,8 +9,9 @@ Solicitud::Solicitud (int nCliente, int nAsientos, std::string zona_v, std::stri
 }
 
 std::string Solicitud::to_string(){
-  return "SOLICITUD ENTRADAS: " + std::to_string(this->nCliente) + " " +
-        std::to_string(this->nAsientos) + " " +  this->zona_v + " " +
+  return "SOLICITUD ENTRADAS :: Cliente: " + std::to_string(this->nCliente)
+        + " || Asientos: " + std::to_string(this->nAsientos)
+        + " || Zona vertical: " +  this->zona_v + " || Zona horizontal: " +
         this->zona_h;
 }
 

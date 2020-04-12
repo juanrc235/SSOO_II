@@ -1,6 +1,7 @@
 #include <string>
 
 class Solicitud {
+
 private:
   int nCliente;
   int nAsientos;
@@ -14,4 +15,5 @@ public:
   int get_nAsientos();
   std::string get_zonaV();
   std::string get_zonaH();
+
 };
