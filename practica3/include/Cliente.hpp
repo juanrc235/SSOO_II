@@ -13,6 +13,7 @@ private:
 
 public:
   Cliente (int nCliente);
+  Cliente ();
   Solicitud get_solicitud();
   void set_asientos(std::vector<int> asientos);
 };

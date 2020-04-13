@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 
 #ifndef SOLICITUD
 #define SOLICITUD
@@ -7,6 +8,8 @@
 
 #define FILAS 6
 #define COLUMNAS 12
+#define ASIENTO_LIBRE 0
+#define ASIENTO_OCUPADO 1
 
 // En la array sala
 // 1 ---> ocupado
@@ -20,6 +23,6 @@ private:
 
 public:
   Taquilla ();
-  std::string pedir_asientos(Solicitud s);
+  bool pedir_asientos(Solicitud s);
   std::string dibujar_sala();
 };
