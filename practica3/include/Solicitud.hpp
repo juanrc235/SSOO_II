@@ -10,6 +10,7 @@ private:
 
 public:
   Solicitud (int nCliente, int nAsientos, std::string zona_v, std::string zona_h);
+  Solicitud ();
   std::string to_string();
   int get_nCliente();
   int get_nAsientos();

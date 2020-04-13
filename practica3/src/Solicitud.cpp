@@ -12,6 +12,8 @@ Solicitud::Solicitud (int nCliente, int nAsientos, std::string zona_v, std::stri
   this->zona_h = zona_h;
 }
 
+Solicitud::Solicitud () {}
+
 std::string Solicitud::to_string(){
   return "SOLICITUD ENTRADAS :: Cliente: " + std::to_string(this->nCliente)
         + " || Asientos: " + std::to_string(this->nAsientos)

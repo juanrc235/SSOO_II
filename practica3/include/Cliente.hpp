@@ -8,11 +8,11 @@
 class Cliente {
 
 private:
-  std::vector<int[]> mis_asientos;
+  std::vector<int> mis_asientos;
   Solicitud mi_solicitud;
 
 public:
   Cliente (int nCliente);
   Solicitud get_solicitud();
-  void set_asientos(std::vector<int[]> asientos);
+  void set_asientos(std::vector<int> asientos);
 };
