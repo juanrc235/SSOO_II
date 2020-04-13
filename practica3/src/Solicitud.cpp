@@ -1,5 +1,9 @@
 #include <string>
+
+#ifndef SOLICITUD
+#define SOLICITUD
 #include "Solicitud.hpp"
+#endif
 
 Solicitud::Solicitud (int nCliente, int nAsientos, std::string zona_v, std::string zona_h) {
   this->nCliente = nCliente;
@@ -24,9 +28,9 @@ int Solicitud::get_nAsientos(){
 }
 
 std::string Solicitud::get_zonaV(){
-  this->zona_v;
+  return this->zona_v;
 }
 
 std::string Solicitud::get_zonaH(){
-  this->zona_h;
+  return this->zona_h;
 }

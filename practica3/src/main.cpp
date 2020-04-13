@@ -1,15 +1,14 @@
-#include "Solicitud.hpp"
+#ifndef SOLICITUD
+  #define SOLICITUD
+  #include "Solicitud.hpp"
+#endif
 #include "Taquilla.hpp"
 #include <iostream>
 #include <cstdlib>
 #include <vector>
 
 int main(int argc, char const *argv[]) {
-
-  std::string zona_vertical[] = {"Cerca", "Medio", "Lejos"};
-  std::string zona_horizontal[] = {"Izquierda", "Centro", "Derecha"};
-  std::srand((int) time(0));
-
+  
   std::vector<Solicitud> vector_solicitudes;
 
   int i, nAsientos, zona_v, zona_h;
@@ -25,7 +24,6 @@ int main(int argc, char const *argv[]) {
   }
 
   Taquilla t;
-
   std::cout << t.dibujar_sala() << std::endl;
 
   return 0;

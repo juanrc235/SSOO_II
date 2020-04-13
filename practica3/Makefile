@@ -15,7 +15,7 @@ main:
 	g++ $(DIRSRC)*.cpp -o $(DIREXE)VENTA_CINES -I$(DIRHEA) $(LDLIBS)
 
 clean :
-	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~
+	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~ $(DIRHEA)*gch
 
 run:
 	$(DIREXE)VENTA_CINES
