@@ -5,6 +5,7 @@
 
 Taquilla::Taquilla() {
   this->libres = FILAS*COLUMNAS;
+  std::cout << "[TAQUILLA] Creada ..." << std::endl;
 }
 
 std::string  Taquilla::dibujar_sala() {
@@ -16,9 +17,11 @@ std::string  Taquilla::dibujar_sala() {
   for (i = 0; i < FILAS; i++) {
     for (j = 0; j < COLUMNAS; j++) {
       if (this->sala[i][j] == ASIENTO_OCUPADO) {
-        dibujo += "(" + std::to_string(i) + "," + std::to_string(j)+ ") " + ocupado + " ";
+        //dibujo += "(" + std::to_string(i) + "," + std::to_string(j)+ ") " + ocupado + " ";
+        dibujo += ocupado + " ";
       } else if (this->sala[i][j] == ASIENTO_LIBRE) {
-        dibujo += "(" + std::to_string(i) + "," + std::to_string(j)+ ") " + libre + " ";
+        //dibujo += "(" + std::to_string(i) + "," + std::to_string(j)+ ") " + libre + " ";
+        dibujo += libre + " ";
       }
     }
     dibujo += "\n\n";
@@ -29,35 +32,21 @@ std::string  Taquilla::dibujar_sala() {
 
 bool Taquilla::pedir_asientos(Solicitud s) {
 
-  std::string zona_vertical[] = {"Cerca", "Medio", "Lejos"};
-  std::string zona_horizontal[] = {"Izquierda", "Centro", "Derecha"};
-
   if (this->libres < s.get_nAsientos()) {
     return false;
   }
 
-  int start_i, start_j, j, i, tmp_asientos = 0;
-
-  for (i = 0; i < 3; i++) {
-    if (zona_vertical[i].compare(s.get_zonaV()) == 0) {
-      start_i = i*2;
-    }
-    if (zona_horizontal[i].compare(s.get_zonaH()) == 0) {
-      start_j = i*4;
-    }
-  }
-
-  for (j = start_j; j < COLUMNAS && tmp_asientos < s.get_nAsientos(); j++) {
-    if (this->sala[start_i][j] != ASIENTO_OCUPADO) {
-      this->sala[start_i][j] = ASIENTO_OCUPADO;
-      tmp_asientos++;
-      this->libres--;
-    }
-    if (j == COLUMNAS - 1) {
-      j = start_j - 1;
-      start_i++;
+  int i, j, asientos_ocupados = 0;
+  for (i = 0; i < FILAS && asientos_ocupados < s.get_nAsientos(); i++) {
+    for (j = 0; j < COLUMNAS && asientos_ocupados < s.get_nAsientos(); j++) {
+        if (this->sala[i][j] != ASIENTO_OCUPADO) {
+          this->sala[i][j] = ASIENTO_OCUPADO;
+          asientos_ocupados++;
+        }
     }
   }
+
+  this->libres -= s.get_nAsientos();
 
   return true;
 }
