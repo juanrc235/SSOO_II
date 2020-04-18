@@ -1,11 +1,12 @@
 #include <string>
 #include <iostream>
+#include <queue>
+#include <thread>
 
 #include "Taquilla.hpp"
 
 Taquilla::Taquilla() {
   this->libres = FILAS*COLUMNAS;
-  std::cout << "[TAQUILLA] Creada ..." << std::endl;
 }
 
 std::string  Taquilla::dibujar_sala() {
@@ -49,4 +50,16 @@ bool Taquilla::pedir_asientos(Solicitud s) {
   this->libres -= s.get_nAsientos();
 
   return true;
+}
+
+void Taquilla::abrir() {
+  std::cout << "[TAQUILLA] .... HEMOS ABIERTO !! ...." << std::endl;
+
+  while (true) {
+    // coger una peticion de la cola
+    // pedir_asientos()
+    // SISTEMA PAGO
+    // transferir hilo a la cola de la comida
+  }
+
 }

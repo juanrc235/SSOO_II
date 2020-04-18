@@ -1,5 +1,6 @@
 #include <string>
-#include <vector>
+#include <queue>
+#include <thread>
 
 #ifndef SOLICITUD
 #define SOLICITUD
@@ -20,9 +21,10 @@ class Taquilla {
 private:
   int sala[FILAS][COLUMNAS] = {0};
   int libres;
+  bool pedir_asientos(Solicitud s);
 
 public:
   Taquilla ();
-  bool pedir_asientos(Solicitud s);
   std::string dibujar_sala();
+  void abrir();
 };

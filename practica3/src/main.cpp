@@ -23,17 +23,19 @@ int main(int argc, char const *argv[]) {
   clean_screen();
   print_banner();
 
-  Taquilla taquilla;
   Sistema_pago sistema_pago;
-  std::queue <Cliente> fila_espera;
+  std::queue<std::thread> cola_taquilla;
 
   int i;
   for (i = 1; i < 11; i++) {
-    Cliente c;
-    fila_espera.push(c);
-    std::cout << "CLIENTE ha llegado a la fila de la taquilla" << '\n';
+    Cliente c(i);
+    cola_taquilla.push( std::thread(&Cliente::esperar_taquilla, &c) );
+    std::this_thread::sleep_for (std::chrono::milliseconds(300));
   }
 
+  Taquilla taquilla;
+  std::thread hilo_taquilla(&Taquilla::abrir, &taquilla);
 
+  hilo_taquilla.join();
   return 0;
 }
