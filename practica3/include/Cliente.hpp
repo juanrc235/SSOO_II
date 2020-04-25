@@ -4,6 +4,7 @@
 #endif
 
 #include <mutex>
+#include <condition_variable>
 
 class Cliente {
 
@@ -16,5 +17,6 @@ public:
   Cliente (int nCliente);
   Cliente ();
   Solicitud get_solicitud();
-  void esperar_taquilla();
+  int get_nCliente();
+  void generar_solicitud_taquilla();
 };

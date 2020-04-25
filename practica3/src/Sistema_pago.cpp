@@ -4,7 +4,6 @@
 #include <iostream>
 
 Sistema_pago::Sistema_pago() {
-  std::cout << "[SISTEMA DE PAGO] Creado ..." << std::endl;
 }
 
 bool Sistema_pago::pagar (Cliente c) {

@@ -1,12 +1,11 @@
 #include <string>
 #include <ctime>
-#include <mutex>
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include "Cliente.hpp"
 
 Cliente::Cliente (int nCliente) {
-  std::srand((unsigned) time(0));
-  this->mi_solicitud = Solicitud (nCliente, (std::rand() % 10)+1);
   this->nCliente = nCliente;
 }
 
@@ -16,8 +15,13 @@ Solicitud Cliente::get_solicitud() {
   return this->mi_solicitud;
 }
 
-void Cliente::esperar_taquilla() {
-  std::cout << "Cliente " + std::to_string(this->nCliente) +
-  " esperando en la cola de la taquilla" << std::endl;
-  while(1);
+int Cliente::get_nCliente() {
+  return this->nCliente;
+}
+
+void Cliente::generar_solicitud_taquilla() {
+  std::srand((unsigned) time(0));
+  this->mi_solicitud = Solicitud (this->nCliente, (std::rand() % 10)+1);
+  // simular generación de solicitud
+  std::this_thread::sleep_for (std::chrono::milliseconds(100));
 }

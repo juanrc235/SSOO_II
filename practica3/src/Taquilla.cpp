@@ -5,8 +5,9 @@
 
 #include "Taquilla.hpp"
 
-Taquilla::Taquilla() {
+Taquilla::Taquilla(int id) {
   this->libres = FILAS*COLUMNAS;
+  this->id = id;
 }
 
 std::string  Taquilla::dibujar_sala() {
@@ -50,16 +51,4 @@ bool Taquilla::pedir_asientos(Solicitud s) {
   this->libres -= s.get_nAsientos();
 
   return true;
-}
-
-void Taquilla::abrir() {
-  std::cout << "[TAQUILLA] .... HEMOS ABIERTO !! ...." << std::endl;
-
-  while (true) {
-    // coger una peticion de la cola
-    // pedir_asientos()
-    // SISTEMA PAGO
-    // transferir hilo a la cola de la comida
-  }
-
 }

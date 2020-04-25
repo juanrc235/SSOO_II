@@ -3,8 +3,13 @@
 #include <thread>
 
 #ifndef SOLICITUD
-#define SOLICITUD
-#include "Solicitud.hpp"
+  #define SOLICITUD
+  #include "Solicitud.hpp"
+#endif
+
+#ifndef CLIENTE
+  #define CLIENTE
+  #include "Cliente.hpp"
 #endif
 
 #define FILAS 6
@@ -21,10 +26,11 @@ class Taquilla {
 private:
   int sala[FILAS][COLUMNAS] = {0};
   int libres;
-  bool pedir_asientos(Solicitud s);
+  int id;
+  std::queue<std::thread> cola;
 
 public:
-  Taquilla ();
+  Taquilla (int id);
   std::string dibujar_sala();
-  void abrir();
+  bool pedir_asientos(Solicitud s);
 };
