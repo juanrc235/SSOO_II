@@ -12,10 +12,10 @@ dirs:
 	mkdir -p $(DIREXE)
 
 main:
-	g++ $(DIRSRC)*.cpp -o $(DIREXE)VENTA_CINES -I$(DIRHEA) $(LDLIBS)
+	g++ $(DIRSRC)*.cpp -o $(DIREXE)CINEMA_SIMULATION -I$(DIRHEA) $(LDLIBS)
 
 clean :
 	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~ $(DIRHEA)*gch
 
 run:
-	$(DIREXE)VENTA_CINES
+	$(DIREXE)CINEMA_SIMULATION

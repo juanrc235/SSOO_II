@@ -13,8 +13,8 @@ Solicitud::Solicitud (int nCliente, int nAsientos) {
 Solicitud::Solicitud () {}
 
 std::string Solicitud::to_string(){
-  return "SOLICITUD ENTRADAS :: Cliente: " + std::to_string(this->nCliente)
-        + " || Asientos: " + std::to_string(this->nAsientos);
+  return "TICKET REQUEST :: Client ID " + std::to_string(this->nCliente)
+        + " || Seats: " + std::to_string(this->nAsientos);
 }
 
 int Solicitud::get_nCliente() {

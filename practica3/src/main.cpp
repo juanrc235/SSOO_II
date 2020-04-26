@@ -20,11 +20,10 @@
 #include <string>
 #include <condition_variable>
 
+std::queue<std::thread> queue_t_office;
+std::queue<std::thread> queue_t_food;
 
-std::queue<std::thread> cola_hilos_office;
-std::queue<std::thread> cola_hilos_comida;
-
-std::queue<Solicitud> cola_solicitudes_t;
+std::queue<Solicitud> qeue_request_office;
 
 std::mutex s_office, s_solicitar_taquilla, s_wait_tickets, s_payment;
 std::mutex mutex_payment, confirmation_payment, s_tickets_payment;
@@ -33,9 +32,9 @@ std::condition_variable turn_tickets;
 
 int client_to_pay, turn = -1;
 
-void ciclo_vida_cliente (Cliente& c);
-void ciclo_vida_taquilla(Taquilla& taquilla);
-void ciclo_vida_sistema_pago(Sistema_pago& pago);
+void client_life_cycle (Cliente& c);
+void ticket_office_life_cycle(Taquilla& ticket_office);
+void payment_system_life_cycle(Sistema_pago& payment_system);
 
 int main(int argc, char const *argv[]) {
 
@@ -48,11 +47,11 @@ int main(int argc, char const *argv[]) {
   clean_screen();
   print_banner();
 
-  Sistema_pago sistema_pago;
-  Taquilla taquilla (1);
+  Sistema_pago payment_system;
+  Taquilla ticket_office (1);
 
-  std::thread hilo_taquilla(ciclo_vida_taquilla, std::ref(taquilla));
-  std::thread t_pay_sys(ciclo_vida_sistema_pago, std::ref(sistema_pago));
+  std::thread t_ticket_office(ticket_office_life_cycle, std::ref(ticket_office));
+  std::thread t_pay_sys(payment_system_life_cycle, std::ref(payment_system));
 
   std::this_thread::sleep_for (std::chrono::milliseconds(300));
   std::cout << MAGENTA << "\nPress [ENTER] to start the simulation ..." << RESET << std::endl;
@@ -62,18 +61,18 @@ int main(int argc, char const *argv[]) {
   for (i = 1; i < 11; i++) {
     Cliente c (i);
     turn = i;
-    cola_hilos_office.push(std::thread(ciclo_vida_cliente, std::ref(c)));
+    queue_t_office.push(std::thread(client_life_cycle, std::ref(c)));
     std::this_thread::sleep_for (std::chrono::milliseconds(300));
     s_tickets_payment.lock();
   }
 
-  hilo_taquilla.join();
+  t_ticket_office.join();
   t_pay_sys.join();
 
   return 0;
 }
 
-void ciclo_vida_cliente(Cliente& c) {
+void client_life_cycle(Cliente& c) {
 
   int id = c.get_nCliente();
   std::unique_lock<std::mutex> lk (s_office);
@@ -84,7 +83,7 @@ void ciclo_vida_cliente(Cliente& c) {
   std::cout << GREEN << c.get_solicitud().to_string() << RESET << std::endl;
   lk.unlock();
 
-  cola_solicitudes_t.push(c.get_solicitud());
+  qeue_request_office.push(c.get_solicitud());
   s_solicitar_taquilla.unlock();
   s_wait_tickets.lock();
 
@@ -95,20 +94,20 @@ void ciclo_vida_cliente(Cliente& c) {
 
 }
 
-void ciclo_vida_taquilla(Taquilla& taquilla) {
+void ticket_office_life_cycle(Taquilla& ticket_office) {
 
   std::cout << RED << "[TICKET OFFICE]" << RESET << " Open and waiting for clients ..." << std::endl;
   while (true) {
     s_solicitar_taquilla.lock(); // nos bloqueamos a la espera de alguna solicitud
 
-    Solicitud solicitud = cola_solicitudes_t.front();
-    cola_solicitudes_t.pop();
+    Solicitud solicitud = qeue_request_office.front();
+    qeue_request_office.pop();
 
-    if ( taquilla.pedir_asientos(solicitud) ){
-        std::cout << RED << "[TICKET OFFICE]" << RESET << " Request of " << YELLOW << "[CLIENTE " + std::to_string(solicitud.get_nCliente()) +
+    if ( ticket_office.pedir_asientos(solicitud) ){
+        std::cout << RED << "[TICKET OFFICE]" << RESET << " Request of " << YELLOW << "[CLIENT " + std::to_string(solicitud.get_nCliente()) +
         "]" << RESET << " attended" << std::endl;
     }
-    std::cout << taquilla.dibujar_sala() << std::endl;
+    std::cout << ticket_office.dibujar_sala() << std::endl;
 
     // Payment simulation
     mutex_payment.lock();
@@ -122,7 +121,7 @@ void ciclo_vida_taquilla(Taquilla& taquilla) {
   }
 }
 
-void ciclo_vida_sistema_pago(Sistema_pago& pago) {
+void payment_system_life_cycle(Sistema_pago& payment_system) {
   std::cout << BLUE << "[PAYMENT SYSTEM]" << RESET << " Created and ready to work ..." << std::endl;
 
   while (true) {
