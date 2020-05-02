@@ -1,15 +1,15 @@
 #ifndef SOLICITUD
   #define SOLICITUD
-  #include "Solicitud.hpp"
+  #include "Ticket_request.hpp"
 #endif
 
 #ifndef CLIENTE
   #define CLIENTE
-  #include "Cliente.hpp"
+  #include "Client.hpp"
 #endif
 
-#include "Taquilla.hpp"
-#include "Sistema_pago.hpp"
+#include "Ticket_Office.hpp"
+#include "Payment_system.hpp"
 #include "Banner.hpp"
 
 #include <iostream>
@@ -32,9 +32,9 @@ std::condition_variable turn_tickets;
 
 int client_to_pay, turn = -1;
 
-void client_life_cycle (Cliente& c);
-void ticket_office_life_cycle(Taquilla& ticket_office);
-void payment_system_life_cycle(Sistema_pago& payment_system);
+void client_life_cycle (Client& c);
+void ticket_office_life_cycle(Ticket_Office& ticket_office);
+void payment_system_life_cycle(Payment_system& payment_system);
 
 int main(int argc, char const *argv[]) {
 
@@ -47,8 +47,8 @@ int main(int argc, char const *argv[]) {
   clean_screen();
   print_banner();
 
-  Sistema_pago payment_system;
-  Taquilla ticket_office (1);
+  Payment_system payment_system;
+  Ticket_Office ticket_office (1);
 
   std::thread t_ticket_office(ticket_office_life_cycle, std::ref(ticket_office));
   std::thread t_pay_sys(payment_system_life_cycle, std::ref(payment_system));
@@ -59,7 +59,7 @@ int main(int argc, char const *argv[]) {
 
   int i;
   for (i = 1; i < 11; i++) {
-    Cliente c (i);
+    Client c (i);
     turn = i;
     queue_t_office.push(std::thread(client_life_cycle, std::ref(c)));
     std::this_thread::sleep_for (std::chrono::milliseconds(300));
@@ -72,14 +72,14 @@ int main(int argc, char const *argv[]) {
   return 0;
 }
 
-void client_life_cycle(Cliente& c) {
+void client_life_cycle(Client& c) {
 
-  int id = c.get_nCliente();
+  int id = c.get_nClient();
   std::unique_lock<std::mutex> lk (s_office);
   turn_tickets.wait(lk, [id]{return (turn == id);}); // clients waits for their turn
 
   c.generar_solicitud_taquilla();
-  std::cout << YELLOW << "\n[CLIENT " << std::to_string(c.get_nCliente()) + "]" << RESET <<" Turn obtained and ticket request generated" << std::endl;
+  std::cout << YELLOW << "\n[CLIENT " << std::to_string(id) + "]" << RESET <<" Turn obtained and ticket request generated" << std::endl;
   std::cout << GREEN << c.get_solicitud().to_string() << RESET << std::endl;
   lk.unlock();
 
@@ -89,12 +89,12 @@ void client_life_cycle(Cliente& c) {
 
   s_office.unlock();
 
-  std::cout << YELLOW << "[CLIENT " << std::to_string(c.get_nCliente()) + "]" << RESET <<" I have my tickets, now I can go for popcorns" << std::endl;
+  std::cout << YELLOW << "[CLIENT " << std::to_string(id) + "]" << RESET <<" I have my tickets, now I can go for popcorns" << std::endl;
   s_tickets_payment.unlock();
 
 }
 
-void ticket_office_life_cycle(Taquilla& ticket_office) {
+void ticket_office_life_cycle(Ticket_Office& ticket_office) {
 
   std::cout << RED << "[TICKET OFFICE]" << RESET << " Open and waiting for clients ..." << std::endl;
   while (true) {
@@ -121,7 +121,7 @@ void ticket_office_life_cycle(Taquilla& ticket_office) {
   }
 }
 
-void payment_system_life_cycle(Sistema_pago& payment_system) {
+void payment_system_life_cycle(Payment_system& payment_system) {
   std::cout << BLUE << "[PAYMENT SYSTEM]" << RESET << " Created and ready to work ..." << std::endl;
 
   while (true) {

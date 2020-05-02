@@ -4,33 +4,33 @@
 
 #ifndef SOLICITUD
   #define SOLICITUD
-  #include "Solicitud.hpp"
+  #include "Ticket_request.hpp"
 #endif
 
 #ifndef CLIENTE
   #define CLIENTE
-  #include "Cliente.hpp"
+  #include "Client.hpp"
 #endif
 
-#define FILAS 6
-#define COLUMNAS 12
-#define ASIENTO_LIBRE 0
-#define ASIENTO_OCUPADO 1
+#define ROWS 6
+#define COLUMNS 12
+#define FREE 0
+#define NOT_FREE 1
 
 // En la array sala
 // 1 ---> ocupado
 // 0 ---> libre
 
-class Taquilla {
+class Ticket_Office {
 
 private:
-  int sala[FILAS][COLUMNAS] = {0};
+  int sala[ROWS][COLUMNS] = {0};
   int libres;
   int id;
   std::queue<std::thread> cola;
 
 public:
-  Taquilla (int id);
+  Ticket_Office (int id);
   std::string dibujar_sala();
   bool pedir_asientos(Solicitud s);
 };

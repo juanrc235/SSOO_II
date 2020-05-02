@@ -2,7 +2,7 @@
 
 #ifndef SOLICITUD
 #define SOLICITUD
-#include "Solicitud.hpp"
+#include "Ticket_request.hpp"
 #endif
 
 Solicitud::Solicitud (int nCliente, int nAsientos) {

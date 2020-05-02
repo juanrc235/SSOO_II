@@ -1,17 +1,16 @@
 #include <mutex>
 #ifndef CLIENTE
   #define CLIENTE
-  #include "Cliente.hpp"
+  #include "Client.hpp"
 #endif
 
-
-class Sistema_pago {
+class Payment_system {
 
 private:
   std::mutex s_pago;
 
 public:
-  Sistema_pago();
-  bool pagar(Cliente c);
+  Payment_system();
+  bool pagar(Client c);
 
 };

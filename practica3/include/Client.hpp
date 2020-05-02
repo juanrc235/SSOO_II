@@ -1,22 +1,22 @@
 #ifndef SOLICITUD
 #define SOLICITUD
-#include "Solicitud.hpp"
+  #include "Ticket_request.hpp"
 #endif
 
 #include <mutex>
 #include <condition_variable>
 
-class Cliente {
+class Client {
 
 private:
   Solicitud mi_solicitud;
   std::mutex en_cola;
-  int nCliente;
+  int nClient;
 
 public:
-  Cliente (int nCliente);
-  Cliente ();
+  Client (int nClient);
+  Client ();
   Solicitud get_solicitud();
-  int get_nCliente();
+  int get_nClient();
   void generar_solicitud_taquilla();
 };

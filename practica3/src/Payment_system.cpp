@@ -1,12 +1,12 @@
-#include "Sistema_pago.hpp"
+#include "Payment_system.hpp"
 #include <thread>
 #include <chrono>
 #include <iostream>
 
-Sistema_pago::Sistema_pago() {
+Payment_system::Payment_system() {
 }
 
-bool Sistema_pago::pagar (Cliente c) {
+bool Payment_system::pagar (Client c) {
   this->s_pago.lock();
 
   /* Simulamos cálculos en el pago */
