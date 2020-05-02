@@ -32,7 +32,7 @@ std::string  Ticket_Office::dibujar_sala() {
   return dibujo;
 }
 
-bool Ticket_Office::pedir_asientos(Solicitud s) {
+bool Ticket_Office::pedir_asientos(Ticket_request s) {
 
   if (this->libres < s.get_nAsientos()) {
     return false;

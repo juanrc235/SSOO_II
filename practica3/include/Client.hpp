@@ -2,21 +2,21 @@
 #define SOLICITUD
   #include "Ticket_request.hpp"
 #endif
-
-#include <mutex>
-#include <condition_variable>
+#include "Food_request.hpp"
 
 class Client {
 
 private:
-  Solicitud mi_solicitud;
-  std::mutex en_cola;
+  Ticket_request ticket_request;
+  Food_request food_request;
   int nClient;
 
 public:
   Client (int nClient);
   Client ();
-  Solicitud get_solicitud();
+  Ticket_request get_ticket_request();
+  Food_request get_foodrequest();
   int get_nClient();
-  void generar_solicitud_taquilla();
+  void generate_ticket_request();
+  void generate_food_request();
 };

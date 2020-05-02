@@ -32,5 +32,5 @@ private:
 public:
   Ticket_Office (int id);
   std::string dibujar_sala();
-  bool pedir_asientos(Solicitud s);
+  bool pedir_asientos(Ticket_request s);
 };
