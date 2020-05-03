@@ -35,7 +35,7 @@ void Client::generate_ticket_request() {
 
 void Client::generate_food_request() {
   std::srand((unsigned) time(0));
-  this->food_request = Food_request((std::rand() % 5)+1, (std::rand() % 5)+1);
+  this->food_request = Food_request((std::rand() % 5)+1, (std::rand() % 5)+1, this->nClient);
   // sleep for simulation purpose
   std::this_thread::sleep_for (std::chrono::milliseconds(100));
 }

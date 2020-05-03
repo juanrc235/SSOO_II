@@ -2,7 +2,11 @@
 #define SOLICITUD
   #include "Ticket_request.hpp"
 #endif
-#include "Food_request.hpp"
+#ifndef FOOD_REQUEST
+  #define FOOD_REQUEST
+  #include "Food_request.hpp"
+#endif
+
 
 class Client {
 
