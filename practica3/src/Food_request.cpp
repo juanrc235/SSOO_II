@@ -36,5 +36,5 @@ void Food_request::attended() {
 }
 
 bool Food_request::is_attended() {
-  return request_attended;
+  return this->request_attended;
 }

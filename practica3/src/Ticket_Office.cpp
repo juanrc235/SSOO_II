@@ -34,6 +34,7 @@ std::string  Ticket_Office::dibujar_sala() {
 
 bool Ticket_Office::pedir_asientos(Ticket_request s) {
 
+  std::lock_guard<std::mutex> lock(this->s_seats);
   if (this->libres < s.get_nAsientos()) {
     return false;
   }

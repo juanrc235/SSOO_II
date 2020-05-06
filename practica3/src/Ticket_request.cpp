@@ -1,10 +1,10 @@
-#include <string>
 #include "Ticket_request.hpp"
 
 
 Ticket_request::Ticket_request (int nCliente, int nAsientos) {
   this->nCliente = nCliente;
   this->nAsientos = nAsientos;
+  this->attended = true;
 }
 
 Ticket_request::Ticket_request () {}
@@ -20,4 +20,12 @@ int Ticket_request::get_nCliente() {
 
 int Ticket_request::get_nAsientos(){
   return this->nAsientos;
+}
+
+bool Ticket_request::is_attended() {
+  return this->attended;
+}
+
+void Ticket_request::set_not_attended() {
+  this->attended = false;
 }

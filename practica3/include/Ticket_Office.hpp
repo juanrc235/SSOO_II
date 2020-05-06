@@ -1,6 +1,7 @@
 #include <string>
 #include <queue>
 #include <thread>
+#include <mutex>
 
 #ifndef SOLICITUD
   #define SOLICITUD
@@ -12,8 +13,8 @@
   #include "Client.hpp"
 #endif
 
-#define ROWS 6
-#define COLUMNS 12
+#define ROWS 2 // 6
+#define COLUMNS 4 // 12
 #define FREE 0
 #define NOT_FREE 1
 
@@ -28,6 +29,7 @@ private:
   int libres;
   int id;
   std::queue<std::thread> cola;
+  std::mutex s_seats;
 
 public:
   Ticket_Office (int id);
