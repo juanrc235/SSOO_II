@@ -2,9 +2,12 @@
   #define FOOD_REQUEST
   #include "Food_request.hpp"
 #endif
-
-#define MAX_DRINKS 20
-#define MAX_POPCORNS 20
+#ifndef SUPPLIER
+  #define SUPPLIER
+  #include "Supplier.hpp"
+#endif
+#include <string>
+#include <mutex>
 
 class Food_Stand {
 
@@ -12,11 +15,13 @@ private:
   int id;
   int nPopcorn;
   int nDrink;
-  // Supplier supplier;
   void call_supplier();
+  std::mutex s_request;
 
 public:
-  Food_Stand (int id);
+  Food_Stand (int id, int drink, int popcorn);
   int get_id();
-  void request_food(Food_request fr);
+  bool request_food(Food_request fr);
+  std::string to_string();
+  void refill();
 };

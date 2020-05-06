@@ -13,14 +13,10 @@
   #include "Client.hpp"
 #endif
 
-#define ROWS 2 // 6
-#define COLUMNS 4 // 12
+#define ROWS 6
+#define COLUMNS 12
 #define FREE 0
 #define NOT_FREE 1
-
-// En la array sala
-// 1 ---> ocupado
-// 0 ---> libre
 
 class Ticket_Office {
 

@@ -8,10 +8,16 @@
   #include "Client.hpp"
 #endif
 
+#ifndef SUPPLIER
+  #define SUPPLIER
+  #include "Supplier.hpp"
+#endif
+
 #include "Ticket_Office.hpp"
 #include "Payment_system.hpp"
 #include "Banner.hpp"
 #include "Food_Stand.hpp"
+
 
 #include <iostream>
 #include <cstdlib>
@@ -22,7 +28,7 @@
 #include <condition_variable>
 #include <mutex>
 
-#define FOOD_STANDS 3
+#define FOOD_STANDS 1
 #define MAX_CLIENTS 10
 
 std::queue<std::thread> main_queue_t;
@@ -31,31 +37,32 @@ std::queue<std::thread> food_stand_t_queue;
 std::queue<Ticket_request> qeue_request_office;
 std::queue<Food_request> qeue_request_food;
 
-std::mutex s_office, s_solicitar_taquilla, s_wait_tickets, s_payment;
-std::mutex mutex_payment, confirmation_payment, s_tickets_payment;
+std::mutex s_office, s_solicitar_taquilla, s_wait_tickets, s_payment, s_supplier;
+std::mutex mutex_payment, confirmation_payment, s_tickets_payment, confirmation_supply;
 std::mutex s_client_food, mutex_food, s_total, s_ticket_request_attended;
 
 std::condition_variable turn_tickets;
 std::condition_variable turn_food;
 std::condition_variable attended_food;
 
-int client_to_pay, turn = -1, total_client_attended;
+int client_to_pay, food_stand_to_supply, turn = -1, total_client_attended;
 int continue_clients[MAX_CLIENTS]; // 0 waits 1 -> no 2 -> si
+Supplier supplier(1);
 
 void client_life_cycle (Client& c);
 void ticket_office_life_cycle(Ticket_Office& ticket_office);
 void payment_system_life_cycle(Payment_system& payment_system);
 void food_stand_life_cycle(Food_Stand& food_stand);
 void make_payment(int client_ID);
-
-//  quedar supplier
-//         arreglar si no tienen entrada
+void supplier_life_cycle(Supplier &supplier);
 
 int main(int argc, char const *argv[]) {
 
   s_solicitar_taquilla.lock();
   s_wait_tickets.lock();
   s_payment.lock();
+  s_supplier.lock();
+  confirmation_supply.lock();
   confirmation_payment.lock();
   s_tickets_payment.lock();
 
@@ -64,6 +71,7 @@ int main(int argc, char const *argv[]) {
 
   Payment_system payment_system;
   Ticket_Office ticket_office (1);
+  Supplier supplier(1);
 
   int i;
 
@@ -73,13 +81,14 @@ int main(int argc, char const *argv[]) {
   std::this_thread::sleep_for (std::chrono::milliseconds(200));
 
   for (i = 0; i < FOOD_STANDS; i++) {
-    Food_Stand fs(i+1);
-    food_stand_t_queue.push(std::thread (food_stand_life_cycle, std::ref(fs)));
+    Food_Stand fs(i+1, 20, 20);
+    food_stand_t_queue.push(std::thread (food_stand_life_cycle, std::ref(fs) ) );
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
   }
-
+  std::thread t_supplier(supplier_life_cycle, std::ref(supplier));
   std::this_thread::sleep_for (std::chrono::milliseconds(300));
-  std::cout << CYAN << "\nPress [ENTER] to start the simulation ..." << RESET << std::endl;
+
+  std::cout << YELLOW << "\nPress [ENTER] to start the simulation ..." << RESET << std::endl;
   std::cin.get();
 
   std::unique_lock<std::mutex> lk (s_office);
@@ -124,8 +133,6 @@ void client_life_cycle(Client& c) {
   if (continue_clients[c.get_nClient()] == 1) {
     std::cout << header << "There is no enought ticket for me. I go home" << std::endl;
     s_tickets_payment.unlock();
-    turn_food.notify_one();
-    return;
   } else if (continue_clients[c.get_nClient()] == 2)  {
     std::cout << header << "I have my tickets, now I can go for popcorns" << std::endl;
     // the client frees the ticket office and the payment system
@@ -200,7 +207,8 @@ void payment_system_life_cycle(Payment_system& payment_system) {
 void food_stand_life_cycle(Food_Stand& food_stand) {
 
   std::string header = "\e[1;35m[FOOD STAND " + std::to_string(food_stand.get_id()) + "]\e[0m ";
-  std::cout << header << " Open and waiting for clients ..." << std::endl;
+  std::cout << header << " Open and waiting for clients :: ";
+  std::cout << food_stand.to_string() << '\n';
   std::unique_lock<std::mutex> lk (s_client_food);
 
   while (true) {
@@ -216,7 +224,15 @@ void food_stand_life_cycle(Food_Stand& food_stand) {
 
     // real function that request the food
     // if no food it blocks until there is food
-    food_stand.request_food(food_request);
+    if ( !food_stand.request_food(food_request) ) {
+      food_stand_to_supply = food_stand.get_id();
+      s_supplier.unlock();
+      confirmation_supply.lock();
+      food_stand.refill();
+      // request food again
+      food_stand.request_food(food_request);
+    }
+    std::cout << header << food_stand.to_string() << std::endl;
     std::this_thread::sleep_for (std::chrono::milliseconds(2000));
 
     std::cout << header << YELLOW << "[CLIENT " + std::to_string(food_request.get_client()) +
@@ -240,4 +256,18 @@ void make_payment(int id) {
   s_payment.unlock(); // wake up payment system
   confirmation_payment.lock(); // wait for confirmation
   mutex_payment.unlock();
+}
+
+void supplier_life_cycle(Supplier &supplier) {
+  std::string header = "\e[1;36m[SUPPLIER " + std::to_string(supplier.get_id()) + "]\e[0m";
+  std::cout << header << " Ready and waiting to supply ..." << '\n';
+  while(1) {
+    s_supplier.lock();
+    std::cout << header << " Suppliying \e[1;35m[FOOD STAND " + std::to_string(food_stand_to_supply) +
+    "]\e[0m" << std::endl;
+    supplier.supply();
+    confirmation_supply.unlock();
+    if (total_client_attended == MAX_CLIENTS) { break; }
+  }
+  std::cout << header << " CLOSED" << '\n';
 }
