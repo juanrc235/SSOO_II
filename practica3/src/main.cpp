@@ -20,6 +20,7 @@
 
 
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <queue>
 #include <thread>
@@ -27,19 +28,21 @@
 #include <string>
 #include <condition_variable>
 #include <mutex>
+#include <exception>
+#include <csignal>
 
 #define FOOD_STANDS 1
 #define MAX_CLIENTS 10
 
 std::queue<std::thread> main_queue_t;
-std::queue<std::thread> food_stand_t_queue;
+std::vector<std::thread> food_stand_t_vector;
 
 std::queue<Ticket_request> qeue_request_office;
 std::queue<Food_request> qeue_request_food;
 
 std::mutex s_office, s_solicitar_taquilla, s_wait_tickets, s_payment, s_supplier;
 std::mutex mutex_payment, confirmation_payment, s_tickets_payment, confirmation_supply;
-std::mutex s_client_food, mutex_food, s_total, s_ticket_request_attended;
+std::mutex s_client_food, mutex_food, s_total, s_ticket_request_attended, s_log;
 
 std::condition_variable turn_tickets;
 std::condition_variable turn_food;
@@ -47,6 +50,7 @@ std::condition_variable attended_food;
 
 int client_to_pay, food_stand_to_supply, turn = -1, total_client_attended;
 int continue_clients[MAX_CLIENTS]; // 0 waits 1 -> no 2 -> si
+bool errLog_created = false;
 Supplier supplier(1);
 
 void client_life_cycle (Client& c);
@@ -55,8 +59,12 @@ void payment_system_life_cycle(Payment_system& payment_system);
 void food_stand_life_cycle(Food_Stand& food_stand);
 void make_payment(int client_ID);
 void supplier_life_cycle(Supplier &supplier);
+void write_errLog(std::string errMsg);
+void signalHandler(int signum);
 
 int main(int argc, char const *argv[]) {
+
+  signal(SIGINT, signalHandler);
 
   s_solicitar_taquilla.lock();
   s_wait_tickets.lock();
@@ -75,6 +83,12 @@ int main(int argc, char const *argv[]) {
 
   int i;
 
+  try {
+
+  } catch (std::exception& e) {
+    write_errLog("In ticket office creation");
+    write_errLog(e.what());
+  }
   std::thread t_ticket_office(ticket_office_life_cycle, std::ref(ticket_office));
   std::this_thread::sleep_for (std::chrono::milliseconds(200));
   std::thread t_pay_sys(payment_system_life_cycle, std::ref(payment_system));
@@ -82,7 +96,7 @@ int main(int argc, char const *argv[]) {
 
   for (i = 0; i < FOOD_STANDS; i++) {
     Food_Stand fs(i+1, 20, 20);
-    food_stand_t_queue.push(std::thread (food_stand_life_cycle, std::ref(fs) ) );
+    food_stand_t_vector.push_back(std::thread (food_stand_life_cycle, std::ref(fs) ) );
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
   }
   std::thread t_supplier(supplier_life_cycle, std::ref(supplier));
@@ -106,8 +120,8 @@ int main(int argc, char const *argv[]) {
     s_tickets_payment.lock();
   }
 
-  t_ticket_office.join();
-  t_pay_sys.join();
+  std::cout << WHITE << "\n####################### SIMULATION ENDS #######################" << std::endl;
+  _Exit(0);
   return 0;
 }
 
@@ -162,6 +176,7 @@ void ticket_office_life_cycle(Ticket_Office& ticket_office) {
 
   std::cout << RED << "[TICKET OFFICE]" << RESET << " Open and waiting for clients ..." << std::endl;
   while (total_client_attended != MAX_CLIENTS) {
+    if (total_client_attended == MAX_CLIENTS) { break; }
     s_solicitar_taquilla.lock(); // nos bloqueamos a la espera de alguna Ticket_request
 
     Ticket_request Ticket_request = qeue_request_office.front();
@@ -182,26 +197,19 @@ void ticket_office_life_cycle(Ticket_Office& ticket_office) {
     }
     // Another client can use the ticket office
     s_wait_tickets.unlock();
-    if (total_client_attended >= MAX_CLIENTS) {
-      break;
-    }
   }
-  std::cout << RED << "[TICKET OFFICE]" << RESET << " CLOSED" << std::endl;
 }
 
 void payment_system_life_cycle(Payment_system& payment_system) {
   std::cout << BLUE << "[PAYMENT SYSTEM]" << RESET << " Created and ready to work ..." << std::endl;
   while (true) {
+    if (total_client_attended == MAX_CLIENTS) { break; }
     s_payment.lock();
     std::cout << BLUE << "[PAYMENT SYSTEM]" << RESET << "Received payment request ... "  << std::endl;
     std::this_thread::sleep_for (std::chrono::milliseconds(1000));
     std::cout << BLUE << "[PAYMENT SYSTEM]" << YELLOW << "[CLIENT "+ std::to_string(client_to_pay) + "]" << RESET << " has paid"  << std::endl;
     confirmation_payment.unlock();
-    if (total_client_attended == MAX_CLIENTS) {
-      break;
-    }
   }
-  std::cout << BLUE << "[PAYMENT SYSTEM]" << RESET << " CLOSED" << std::endl;
 }
 
 void food_stand_life_cycle(Food_Stand& food_stand) {
@@ -212,6 +220,7 @@ void food_stand_life_cycle(Food_Stand& food_stand) {
   std::unique_lock<std::mutex> lk (s_client_food);
 
   while (true) {
+    if (total_client_attended == MAX_CLIENTS) { break; }
     turn_food.wait(lk, []{return !qeue_request_food.empty();});
 
     // get a new food request [exclusive access]
@@ -244,18 +253,7 @@ void food_stand_life_cycle(Food_Stand& food_stand) {
     attended_food.notify_all();
     food_request.attended();
     lk.lock();
-
-    if (total_client_attended == MAX_CLIENTS) { break; }
   }
-}
-
-void make_payment(int id) {
-  // Payment simulation
-  mutex_payment.lock();
-  client_to_pay = id;
-  s_payment.unlock(); // wake up payment system
-  confirmation_payment.lock(); // wait for confirmation
-  mutex_payment.unlock();
 }
 
 void supplier_life_cycle(Supplier &supplier) {
@@ -269,5 +267,34 @@ void supplier_life_cycle(Supplier &supplier) {
     confirmation_supply.unlock();
     if (total_client_attended == MAX_CLIENTS) { break; }
   }
-  std::cout << header << " CLOSED" << '\n';
+}
+
+void make_payment(int id) {
+  // Payment simulation
+  mutex_payment.lock();
+  client_to_pay = id;
+  s_payment.unlock(); // wake up payment system
+  confirmation_payment.lock(); // wait for confirmation
+  mutex_payment.unlock();
+}
+
+void write_errLog(std::string errMsg) {
+  s_log.lock();
+  std::ofstream myfile;
+  if (!errLog_created) {
+    myfile.open ("errLog.txt", std::ios::trunc);
+    myfile << "################ ERROR LOG ##############" << std::endl;
+    errLog_created = true;
+  }
+  myfile.open ("errLog.txt", std::ios::app);
+  myfile << errMsg << std::endl;
+  std::cout << RED << "[ERROR] " << RESET <<  errMsg  << std::endl;
+  myfile.close();
+  s_log.unlock();
+}
+
+void signalHandler( int signum ) {
+  std::cout << '\n';
+  write_errLog("Program aborted by user (Ctrl+C)");
+  _Exit(0);
 }
