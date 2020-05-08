@@ -26,3 +26,6 @@ como petición de tickets o de palomitas y bebida.  Sin embargo, todo la simulac
 En primer lugar, se crean los recursos comunes como son la taquilla, sistema de pago, el reponedor y los puestos
 de comida. Tras esto comienza el bucle de donde se crean los clientes. En cuanto el primer cliente es creado empieza
 a funcionar la simulación. Todo se organiza mediante mutex, variables de condición y unique_lock().
+
+Además se añade control de excepciones, asi como un log del sistema en caso de error. También, se ha incluido un 
+`signal handler` para atender si el usuario presiona `Ctrl+C`
